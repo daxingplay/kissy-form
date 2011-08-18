@@ -1,0 +1,140 @@
+/**
+ * @fileoverview 单选框美化
+ * @author: 剑平<minghe36@126.com>
+ *
+ **/
+KISSY.add(function(S, DOM, Base, Event) {
+    var EMPTY = '',CHECKED = 'ks-radio-checked',
+        data = {TARGET : 'data-target'},
+        //控制台
+        console = console || S,LOG_PREFIX = '[nice-radio]:',
+        DOM = DOM || S.DOM,Base = Base || S.Base,Event = Event || S.Event;        ;
+    /**
+     * @name Radio
+     * @class 单选框美化
+     * @constructor
+     * @param {String} target 目标
+     * @param {Object} config 配置对象
+     */
+    function Radio(target, config) {
+        var self = this;
+        /**
+         * 单选框目标
+         * @type Array
+         */
+        self.target = S.query(target);
+        self.radios = [];
+        //超类初始化
+        Radio.superclass.constructor.call(self, config);
+    }
+
+    //继承于KISSY.Base
+    S.extend(Radio, Base);
+    /**
+     * 设置参数
+     */
+    Radio.ATTRS = {
+        /**
+         * 是否自动运行
+         * @type Boolean
+         */
+        autoRender : {
+            value : false,
+            setter : function(v) {
+                v && this.render();
+                return v;
+            }
+        },
+        /**
+         * 单选框模板
+         * @type String
+         */
+        tpl : {
+            value : '<span class="g-u ks-radio" rel="{name}"></span>'
+        }
+    };
+    S.mix(Radio,{
+            /**
+             * 样式
+             */
+            cls : {CHECKED : 'ks-radio-checked',DISABLED : 'ks-radio-disabled'},
+            data : {DISABLED : 'data-disabled',TARGET : 'data-target'}
+    });
+    /**
+     * 方法
+     */
+    S.augment(Radio, {
+            /**
+             * 运行
+             */
+            render : function() {
+                var self = this,target = self.target;
+                if(target.length == 0){
+                    console.log(LOG_PREFIX + '单选框容器不存在！');
+                    return false;
+                }
+                DOM.hide(target);
+                Event.on(target,'change',self._changeHandler,self);
+                self._createRadio();
+                S.each(target,function(input){
+                    if(DOM.attr(input,'checked')){
+                        if(Event.trigger) Event.trigger(DOM.data(input,data.TARGET),'click');
+                    }
+                });
+            },
+            /**
+             * 创建美化的图片单选框来代替系统原生单选框
+             */
+            _createRadio : function(){
+                var self = this,target = self.target,radioTpl = self.get('tpl'),
+                    name,disabled,html,radio;
+                S.each(target,function(item){
+                    name = DOM.attr(item,'name');
+                    disabled = DOM.attr(item,'disabled');
+                    html = S.substitute(radioTpl,{name : name});
+                    radio = DOM.create(html);
+                    //将图片单选框插入到单选框前面
+                    DOM.insertBefore(radio,item);
+                    //监听图片单选框的单机事件
+                    Event.on(radio,'click',self._radioClickHandler,self);
+                    DOM.data(radio,data.TARGET,item);
+                    DOM.data(item,data.TARGET,radio);
+                    self.radios.push(radio);
+                    if(disabled) self.setDisabled(radio);
+                })
+            },
+            /**
+             * 单击美化后单选框后事件监听器
+             */
+            _radioClickHandler : function(ev){
+                var self = this,target = ev.target,input = DOM.data(target,Radio.data.TARGET),
+                    checkedCls = Radio.cls.CHECKED;
+                if(DOM.data(target,Radio.data.DISABLED))return false;
+                DOM.removeClass(self.radios,checkedCls);
+                //添加选中样式
+                DOM.addClass(target,checkedCls);
+                DOM.attr(input,'checked',true);
+                //触发单选框的事件
+                //TODO:该方法为明河自定义的方法请看core.js
+                if(Event.trigger){
+                    Event.trigger(input,'change');
+                    Event.trigger(input,'click');
+                }
+            },
+            /**
+             * 设置单选框不可用
+             * @param {HTMLElement} radio 模拟单选框元素
+             */
+            setDisabled : function(radio){
+                var self = this,disabledCls = Radio.cls.DISABLED,data = Radio.data,
+                    radioTarget = DOM.data(radio,data.TARGET);
+                if(!radio) return false;
+                DOM.addClass(radio,disabledCls);
+                DOM.data(radio,data.DISABLED,true);
+                if(!DOM.attr(radioTarget,'disabled')) DOM.attr(radioTarget,'disabled',true);
+            }
+        });
+    S.namespace('nice');
+    S.nice.Radio = Radio;
+    return Radio;
+}, {requires:['dom','base','event']});

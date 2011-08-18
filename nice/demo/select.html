@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="gbk"/>
+<title>美化选择框demo</title>
+<script src="http://a.tbcdn.cn/s/kissy/1.1.6/kissy-min.js"></script>
+<link href="http://assets.daily.taobao.net/s/kissy/1.2.0/cssreset-min.css" rel="stylesheet" />
+<script src="../../kissy/template.js"></script>
+<link href="../assets/default.css" rel="stylesheet" />
+<script src="../base.js"></script>
+<script src="../list.js"></script>
+<script src="../select.js"></script>
+<script>
+    var S = KISSY,nice = S.nice;
+    S.ready(function(){
+        var select1 = new nice.Select('#J_Demo1');
+        select1.render();
+    });
+</script>
+<style>
+    .demo-wrapper{
+        margin: 20px;
+    }
+    #J_Demo1{
+        width:150px;
+    }
+</style>
+</head>
+<body>
+    <div class="demo-wrapper">
+        <select name="reason" id="J_Demo1">
+            <option value="" selected="selected" data-msg="">请选择退款原因</option>
+            <option selected="selected" value="5">
+                与卖家协商一致退款
+            </option>
+            <option value="6">
+                未按约定时间发货
+            </option>
+            <option value="21">
+                卖家虚假发货
+            </option>
+            <option value="0">
+                其他
+            </option>
+        </select>
+    </div>
+</body>
+</html>
