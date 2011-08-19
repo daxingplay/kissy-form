@@ -8,7 +8,7 @@ KISSY.add(function(S, DOM, Base, Event) {
         data = {TARGET : 'data-target'},
         //控制台
         console = console || S,LOG_PREFIX = '[nice-radio]:',
-        DOM = DOM || S.DOM,Base = Base || S.Base,Event = Event || S.Event;        ;
+        DOM = DOM || S.DOM,Base = Base || S.Base,Event = Event || S.Event;
     /**
      * @name Radio
      * @class 单选框美化
