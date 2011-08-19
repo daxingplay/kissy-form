@@ -287,4 +287,4 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
             }
         });
     return Select;
-}, {requires:['dom','base','event','anim','','rf/com/form/nice/list']});
+}, {requires:['dom','base','event','anim','form/nice/list']});

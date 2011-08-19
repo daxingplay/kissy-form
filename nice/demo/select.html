@@ -3,20 +3,9 @@
 <head>
 <meta charset="gbk"/>
 <title>美化选择框demo</title>
-<script src="http://a.tbcdn.cn/s/kissy/1.1.6/kissy-min.js"></script>
-<link href="http://assets.daily.taobao.net/s/kissy/1.2.0/cssreset-min.css" rel="stylesheet" />
-<script src="../../kissy/template.js"></script>
+<script src="http://a.tbcdn.cn/s/kissy/1.2.0/kissy-min.js"></script>
+<link href="http://a.tbcdn.cn/s/kissy/1.2.0/cssreset-min.css" rel="stylesheet" />
 <link href="../assets/default.css" rel="stylesheet" />
-<script src="../base.js"></script>
-<script src="../list.js"></script>
-<script src="../select.js"></script>
-<script>
-    var S = KISSY,nice = S.nice;
-    S.ready(function(){
-        var select1 = new nice.Select('#J_Demo1');
-        select1.render();
-    });
-</script>
 <style>
     .demo-wrapper{
         margin: 20px;
@@ -44,5 +33,16 @@
             </option>
         </select>
     </div>
+<script>
+    //设置模块加载包配置
+    KISSY.config({packages: [{
+        name: 'form',
+        path: '../../../'
+    }]});
+    KISSY.use('form/nice/select',function(S,Select){
+        var select = new Select('#J_Demo1');
+        select.render();
+    })
+</script>
 </body>
 </html>
