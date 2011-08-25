@@ -33,11 +33,15 @@
             </option>
         </select>
     </div>
+    <div id="J_ListDemo" class="list-demo">
+        
+    </div>
 <script>
     //设置模块加载包配置
     KISSY.config({packages: [{
         name: 'form',
-        path: '../../../'
+        path: '../../../',
+        charset : 'gbk'
     }]});
     KISSY.use('form/nice/select',function(S,Select){
         var select = new Select('#J_Demo1');

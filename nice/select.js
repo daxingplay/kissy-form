@@ -93,7 +93,7 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
          * @type String
          */
         tpl : {
-            value : '<div class="ks-nice-select-container"><div class="ks-nice-select J_NiceSelect"><span class="select-text J_SelectText">{text}</span><span class="select-icon J_SelectIcon"></span></div><div class="list-container J_ListContainer"></div></div>'
+            value : '<div class="ks-nice-select-container" tabindex="0" aria-label="点击tab进入选项选择，点击esc退出选择"><div class="ks-nice-select J_NiceSelect"><span class="select-text J_SelectText">{text}</span><span class="select-icon J_SelectIcon"></span></div><div class="list-container J_ListContainer"></div></div>'
         },
         /**
          * 鼠标滑过选择框样式
@@ -119,15 +119,21 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
              * 运行
              */
             render : function() {
-                var self = this,target = self.target,select;
+                var self = this,target = self.target,select,selectContainer;
                 if(!target){
                     console.log(LOG_PREFIX + '选择框不存在！');
                     return false;
                 }
                 DOM.hide(target);
                 self._create();
-                self._setWidth(self.get('width'));
                 select = self.select;
+                selectContainer = self.selectContainer;
+                //选择框容器
+                Event.on(selectContainer,'keyup',self._keyupHandler,self);
+                //阻止事件冒泡
+                Event.on(selectContainer,'click',function(ev){
+                    ev.stopPropagation();
+                });
                 Event.on(select,'mouseover mouseout',self._hoverHandler,self);
                 Event.on(select,'click',self._clickHandler,self);
                 Event.on('body','click',function(ev){
@@ -149,8 +155,13 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
              * 显示列表
              */
             show : function(){
-                var self = this,listContainer = self.listContainer,select = self.select,
-                    iframe = self.iframe, cls = self.get('clickCls');
+                var self = this;
+                if(self.list == EMPTY){
+                    self.list = self._renderList();
+                    self.iframe = self._createIframe();
+                    self._setWidth(self.get('width'));
+                }
+                var select = self.select,iframe = self.iframe, cls = self.get('clickCls'),listContainer = self.listContainer;
                 DOM.show(listContainer);
                 if(iframe != EMPTY) DOM.show(iframe);
                 //增加激活样式
@@ -170,7 +181,7 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
                 }
                 if(!S.isNumber(width)) return false;
                 DOM.width(selectContainer,width);
-                DOM.width(listContainer,width);
+                listContainer && DOM.width(listContainer,width);
             },
             /**
              * 创建模拟选择框
@@ -191,8 +202,7 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
                 self.currentData = S.merge(self.currentData,data);
                 self.selectContainer = selectContainer;
                 self.select =  DOM.children(selectContainer,Select.hook.SELECT);
-                self.list = self._renderList();
-                self.iframe = self._createIframe();
+                self._setWidth(self.get('width'));
             },
             /**
              * 运行模拟列表
@@ -240,35 +250,74 @@ KISSY.add(function(S, DOM, Base, Event,Anim,List) {
              * @param {Object} ev 事件对象
              */
             _clickHandler : function(ev){
-                var self = this,select = self.select,listContainer = self.listContainer;
-                if(DOM.css(listContainer,'display') == 'none'){
+                var self = this,listContainer = self.listContainer;
+                if(self.list == EMPTY || DOM.css(listContainer,'display') == 'none'){
                     self.show();
                 }else{
                     self.hide();
                 }
-
-                ev.stopPropagation();
-
             },
             /**
-             * 鼠标点击列表选项
-             * @param {Object} ev 事件对象
+             * 键盘事件监听器（主要监听esc键）
              */
-            _listItemClickHandler : function(ev){
-                var self = this,text = ev.text,value = ev.value,select = self.select,
-                    textContainer = DOM.children(select,Select.hook.TEXT);
+            _keyupHandler : function(ev){
+                var self = this,keyCode = ev.keyCode,list = self.list,currentIndex = list.currentIndex;
+                switch(keyCode){
+                    //esc键
+                    case 27:
+                        self.hide();
+                    break;
+                    //tab键
+                    case 9 :
+                        self.show();
+                    break;
+                    //向下键
+                    case 40 :
+                        currentIndex ++;
+                        list.select(currentIndex);
+                    break;
+                    //向上键
+                    case 38 :
+                        currentIndex --;
+                        list.select(currentIndex);
+                    break;
+                    //enter键
+                    case 13 :
+                        self.change(currentIndex);
+                    break;
+                }
+            },
+            /**
+             * 改变选择框的值
+             */
+            change : function(index){
+                var self = this,select = self.select,textContainer = DOM.children(select,Select.hook.TEXT),
+                    list = self.list,itemData = list.getItemData(index),text,value;
+                if(S.isEmptyObject(itemData)) return false;
+                text = itemData.text;
+                value = itemData.value;
                 //选择的值发生改变
                 if(self.currentData.value != value){
                     //将列表选中值写入输入框
                     DOM.text(textContainer,text);
                     DOM.val(self.target,value);
+                    //重写
+                    S.mix(self.currentData,itemData);
                     //触发change事件
                     if(Event.trigger) Event.trigger(self.target,'change');
                 }
+                self.hide();
+            },
+            /**
+             * 鼠标点击列表选项后触发的事件监听器
+             * @param {Object} ev 事件对象（ev.index：被点击的列表项在列表中的索引值）
+             */
+            _listItemClickHandler : function(ev){
+                var self = this;
+                //改变选择框的值
+                self.change(ev.index);
                 //触发原生选择框的click事件
                 if(Event.trigger) Event.trigger(self.target,'click');
-                //重写
-                self.currentData = S.merge(self.currentData,{text : ev.text,value : ev.value});
             },
             /**
              * 用于修正IE6浮出层无法遮住表单元素的bug

@@ -47,7 +47,7 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
              * 模板
              */
             tpl : {
-                DEFAULT : '<ul class="ks-nice-list">' +
+                DEFAULT : '<ul class="ks-nice-list" tabindex="0">' +
                     '{{#each data}}' +
                     '<li data-value="{{_ks_value.value}}">{{_ks_value.text}}</li>' +
                     '{{/each}}' +
@@ -60,7 +60,7 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
             /**
              * 支持的事件
              */
-            event : {RENDER : 'render',CLICK : 'click'},
+            event : {RENDER : 'render',CLICK : 'click',ITEM_MOUSEOVER : 'itemMouseover',ITEM_MOUSEOUT : 'itemMouseout'},
             /**
              * 缓存数据key名
              */
@@ -147,14 +147,44 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
             select : function(value){
                 var self = this,currentCls = List.cls.CURRENT,
                     list = self.list,lis = DOM.children(list);
-                S.each(lis,function(li,i){
-                    if(DOM.attr(li,List.data.VALUE) == value){
-                        DOM.removeClass(lis,currentCls);
-                        DOM.addClass(li,currentCls);
-                        self.currentIndex = i;
-                        return true;
+                if(S.isString(value)){
+                    S.each(lis,function(li,i){
+                        if(DOM.attr(li,List.data.VALUE) == value){
+                            _changeStyle(li);
+                            self.currentIndex = i;
+                            return true;
+                        }
+                    })
+                }
+                //列表子元素索引
+                else if(S.isNumber(value)){
+                    if(value == lis.length){
+                        value = 0;
+                    }else if(value < 0){
+                        value = lis.length - 1;
                     }
-                })
+                    _changeStyle(lis[value]);
+                    self.currentIndex = value;
+                }
+                /**
+                 * 改变选中样式
+                 * @param {HTMLElement} li 列表子元素
+                 */
+                function _changeStyle(li){
+                    DOM.removeClass(lis,currentCls);
+                    DOM.addClass(li,currentCls);
+                }
+                return self.currentIndex;
+            },
+            /**
+             * 获取当前索引的列表子项数据
+             * @param {Number} index 列表索引
+             */
+            getItemData : function(index){
+                if(!S.isNumber(index)) return false;
+                var self = this,data = self.get('data'),itemData;
+                itemData = data[index] || {};
+                return itemData;
             },
             /**
              * 创建列表
@@ -168,13 +198,13 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
             },
             /**
              * 点击列表选项时触发
+             * @param {Object} ev 事件对象
              */
             _clickHandler : function(ev){
-                var self = this,target = ev.target,currentCls = List.cls.CURRENT,
-                    list = self.list,lis = DOM.children(list),
-                    text = S.trim(DOM.text(target)),value = DOM.attr(target,List.data.VALUE);
-                self.select(value);
-                self.fire(List.event.CLICK,{text : text,value : value,target : target});
+                var self = this,target = ev.target, list = self.list,index,
+                    value = DOM.attr(target,List.data.VALUE);
+                index = self.select(value);
+                self.fire(List.event.CLICK,{index : index,target : target});
             },
             /**
              * 鼠标滑过事件监听器
@@ -185,8 +215,10 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
                 if(!S.isString(cls)) return false;
                 if(type == 'mouseover'){
                     DOM.addClass(target,cls);
+                    self.fire(List.event.ITEM_MOUSEOVER,{target : target});
                 }else if(type == 'mouseout'){
                     DOM.removeClass(target,cls);
+                    self.fire(List.event.ITEM_MOUSEOUT,{target : target});
                 }
             }
         });

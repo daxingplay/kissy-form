@@ -38,6 +38,7 @@
     height: 22px;
     background-color: #fff;
     cursor: pointer;
+    -moz-user-select: none;
 }
 
 .ks-nice-select-container .ks-nice-select .select-text {
