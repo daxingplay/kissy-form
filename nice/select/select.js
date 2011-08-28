@@ -89,6 +89,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
             },
             /**
              * 创建模拟选择框容器
+             * @return {HTMLElement} 选择框容器
              */
             _createWrapper : function(){
                 var self = this,target = self.target,tpl = self.get('tpl'),selectContainer;
@@ -102,6 +103,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
             },
             /**
              * 生成个选择框按钮
+             * @return {Button} Button的实例
              */
             _initButton : function(){
                 var self = this,container = self.selectContainer,button = EMPTY,
@@ -114,6 +116,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
             },
             /**
              * 将选择框的选项转换成一个数组数据
+             * @return {Array} 用于模拟选择框的数据
              */
             _getData : function(){
                 var self = this,target = self.target,options = DOM.children(target),data = [],dataItem = {};
@@ -129,7 +132,8 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
             },
             /**
              * 设置模拟选择框的宽度
-             * @param {Number | String} width 宽度
+             * @param {Number | String} width 宽度，值为‘auto’时自动获取原生选择框的宽度
+             * @return {Number} 宽度
              */
             _setWidth : function(width){
                 var self = this,target = self.target,container = self.selectContainer,button = self.button;
@@ -147,6 +151,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 if(button != EMPTY){
                     button.set('style',{width : width});
                 }
+                return width;
             }
         });
     return Select;

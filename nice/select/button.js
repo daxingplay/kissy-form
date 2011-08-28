@@ -90,6 +90,7 @@ KISSY.add('form/nice/select/button',function(S, DOM,Event, Base){
             },
             /**
              * 创建选择框按钮
+             * @return {HTMLElement} 按钮元素
              */
             _create : function(){
                 var self = this,container = self.container,tpl = self.get('tpl'),
