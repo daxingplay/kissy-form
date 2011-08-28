@@ -3,7 +3,7 @@
  * @author: 剑平（明河）<minghe36@126.com>
  *
  **/
-KISSY.add('form/nice/select',function(S, DOM, Base, Event,Anim,List) {
+KISSY.add('form/nice/select/select',function(S, DOM, Base, Event,Anim,List) {
     var EMPTY = '',
         //控制台
         console = console || S,LOG_PREFIX = '[nice-select]:',
@@ -56,7 +56,7 @@ KISSY.add('form/nice/select',function(S, DOM, Base, Event,Anim,List) {
          * 当前选中的数据
          * @type Object
          */
-        self.currentData = {text : EMPTY,value : EMPTY}; 
+        self.currentData = {text : EMPTY,value : EMPTY};
         //超类初始化
         Select.superclass.constructor.call(self, config);
     }
@@ -336,4 +336,4 @@ KISSY.add('form/nice/select',function(S, DOM, Base, Event,Anim,List) {
             }
         });
     return Select;
-}, {requires:['dom','base','event','anim','form/nice/list']});
+}, {requires:['dom','base','event','anim','form/nice/list/list']});
