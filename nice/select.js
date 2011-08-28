@@ -3,7 +3,7 @@
  * @author: 剑平（明河）<minghe36@126.com>
  *
  **/
-KISSY.add('form/nice/select',function(S, DOM, Base, Event,Anim,List) {
+KISSY.add('form/nice/select',function(S, DOM, Base, Event) {
     var EMPTY = '',
         //控制台
         console = console || S,LOG_PREFIX = '[nice-select]:',
@@ -336,4 +336,4 @@ KISSY.add('form/nice/select',function(S, DOM, Base, Event,Anim,List) {
             }
         });
     return Select;
-}, {requires:['dom','base','event','anim','form/nice/list']});
+}, {requires:['dom','base','event']});

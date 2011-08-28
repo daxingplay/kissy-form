@@ -1,77 +1,45 @@
 /**
- * @fileoverview ÃÀ»¯µÄÑ¡Ôñ¿ò
- * @author: ½£Æ½£¨Ã÷ºÓ£©<minghe36@126.com>
+ * @fileoverview ç¾åŒ–çš„é€‰æ‹©æ¡†
+ * @author: å‰‘å¹³ï¼ˆæ˜æ²³ï¼‰<minghe36@126.com>
  *
  **/
-KISSY.add('form/nice/select/select',function(S, DOM, Base, Event,Anim,List) {
-    var EMPTY = '',
-        //¿ØÖÆÌ¨
-        console = console || S,LOG_PREFIX = '[nice-select]:',
-        IFRAME_TPL = '<iframe src="" width="{width}" height="{height}" class="ks-nice-select-iframe"></iframe>';
+KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
+    var EMPTY = '', LOG_PREFIX = '[nice-select]:';
     /**
      * @name Select
-     * @class ÃÀ»¯µÄÑ¡Ôñ¿ò
+     * @class ç¾åŒ–çš„é€‰æ‹©æ¡†
      * @constructor
-     * @param {String} target Ä¿±ê
-     * @param {Object} config ÅäÖÃ¶ÔÏó
+     * @param {String} target ç›®æ ‡
+     * @param {Object} config é…ç½®å¯¹è±¡
+     * @property {HTMLElement} target ç›®æ ‡é€‰æ‹©æ¡†å…ƒç´ 
+     * @property {HTMLElement} selectContainer æ¨¡æ‹Ÿé€‰æ‹©æ¡†å®¹å™¨
+     * @property {Array} data ä»é€‰æ‹©æ¡†æå–çš„æ•°æ®é›†åˆ
+     * @property {Object} curSelData å½“å‰é€‰æ‹©æ¡†çš„æ•°æ®
      */
     function Select(target, config) {
         var self = this;
-        /**
-         * Ñ¡Ôñ¿òÄ¿±ê
-         * @type Array
-         */
         self.target = S.get(target);
-        /**
-         * Êı¾İ¼¯ºÏ
-         * @type Array
-         */
-        self.data = [];
-        /**
-         * ÁĞ±íÈİÆ÷
-         * @type HTMLElement
-         */
-        self.listContainer = EMPTY;
-        /**
-         * ÓÃÓÚĞŞÕıIE6¸¡³ö²ãbugµÄiframeÔªËØ
-         * @type HTMLElement
-         */
-        self.iframe = EMPTY;
-        /**
-         * Ä£ÄâÁĞ±íÊµÀı
-         * @type Object
-         */
-        self.list = EMPTY;
-        /**
-         * Ñ¡Ôñ¿ò
-         * @type HTMLElement
-         */
-        self.select = EMPTY;
-        /**
-         * Ñ¡Ôñ¿òÈİÆ÷
-         * @type HTMLElement
-         */
         self.selectContainer = EMPTY;
-        /**
-         * µ±Ç°Ñ¡ÖĞµÄÊı¾İ
-         * @type Object
-         */
-        self.currentData = {text : EMPTY,value : EMPTY};
-        //³¬Àà³õÊ¼»¯
+        self.data = [];
+        self.curSelData = {};
+        //è¶…ç±»åˆå§‹åŒ–
         Select.superclass.constructor.call(self, config);
     }
 
-    //¼Ì³ĞÓÚKISSY.Base
+    //ç»§æ‰¿äºKISSY.Base
     S.extend(Select, Base);
-    S.mix(Select,{
-       hook : {LIST_CONTAINER : '.J_ListContainer',SELECT : '.J_NiceSelect',TEXT : '.J_SelectText'}
+    //é™æ€å±æ€§å’Œæ–¹æ³•
+    S.mix(Select,/**@lends Select*/{
+        tpl : {
+            DEFAULT: '<div class="ks-select" tabindex="0" aria-label="ç‚¹å‡»tabè¿›å…¥é€‰é¡¹é€‰æ‹©ï¼Œç‚¹å‡»escé€€å‡ºé€‰æ‹©">' +
+                        
+                     '</div>'
+        }
     });
-    /**
-     * ÉèÖÃ²ÎÊı
-     */
+    //ç»„ä»¶å‚æ•°
     Select.ATTRS = {
         /**
-         * ÊÇ·ñ×Ô¶¯ÔËĞĞ
+         * æ˜¯å¦è‡ªåŠ¨è¿è¡Œ
          * @type Boolean
          */
         autoRender : {
@@ -82,258 +50,70 @@ KISSY.add('form/nice/select/select',function(S, DOM, Base, Event,Anim,List) {
             }
         },
         /**
-         * Ñ¡Ôñ¿ò¿í¶È
-         * @type Number
-         */
-        width : {
-            value : 'auto'
-        },
-        /**
-         * Ñ¡Ôñ¿òÄ£°å
+         * æ¨¡æ‹Ÿé€‰æ‹©æ¡†å®¹å™¨æ¨¡æ¿
          * @type String
          */
         tpl : {
-            value : '<div class="ks-nice-select-container" tabindex="0" aria-label="µã»÷tab½øÈëÑ¡ÏîÑ¡Ôñ£¬µã»÷escÍË³öÑ¡Ôñ"><div class="ks-nice-select J_NiceSelect"><span class="select-text J_SelectText">{text}</span><span class="select-icon J_SelectIcon"></span></div><div class="list-container J_ListContainer"></div></div>'
-        },
-        /**
-         * Êó±ê»¬¹ıÑ¡Ôñ¿òÑùÊ½
-         * @type String
-         */
-        hoverCls : {
-            value : 'ks-nice-select-hover'
-        },
-        /**
-         * Êó±êµ¥»÷Ñ¡Ôñ¿ò£¬ÁĞ±íÏÔÊ¾ºóÌí¼ÓµÄÑùÊ½
-         * @type String
-         */
-        clickCls : {
-            value : 'ks-nice-select-click'
+            value : Select.tpl.DEFAULT
         }
     };
-
-    /**
-     * ·½·¨
-     */
-    S.augment(Select, {
+    //ç»„ä»¶æ–¹æ³•
+    S.augment(Select,
+        /**@lends Select.prototype */
+        {
             /**
-             * ÔËĞĞ
+             * è¿è¡Œ
              */
             render : function() {
-                var self = this,target = self.target,select,selectContainer;
+                var self = this,target = self.target;
                 if(!target){
-                    console.log(LOG_PREFIX + 'Ñ¡Ôñ¿ò²»´æÔÚ£¡');
+                    S.log(LOG_PREFIX + 'ç›®æ ‡é€‰æ‹©æ¡†ä¸å­˜åœ¨ï¼');
                     return false;
                 }
-                DOM.hide(target);
-                self._create();
-                select = self.select;
-                selectContainer = self.selectContainer;
-                //Ñ¡Ôñ¿òÈİÆ÷
-                Event.on(selectContainer,'keyup',self._keyupHandler,self);
-                //×èÖ¹ÊÂ¼şÃ°Åİ
-                Event.on(selectContainer,'click',function(ev){
-                    ev.stopPropagation();
-                });
-                Event.on(select,'mouseover mouseout',self._hoverHandler,self);
-                Event.on(select,'click',self._clickHandler,self);
-                Event.on('body','click',function(ev){
-                    self.hide();
-                });
-                DOM.data(target,'data-select',self);
+                self._getData();
+                self._createWrapper();
+                self._initButton();
             },
             /**
-             * Òş²ØÁĞ±í
+             * åˆ›å»ºæ¨¡æ‹Ÿé€‰æ‹©æ¡†å®¹å™¨
              */
-            hide : function(){
-                var self = this,select = self.select,cls = self.get('clickCls'),
-                    listContainer = self.listContainer,iframe = self.iframe;
-                DOM.hide(listContainer);
-                if(iframe != EMPTY) DOM.hide(iframe);
-                DOM.removeClass(select,cls);
-            },
-            /**
-             * ÏÔÊ¾ÁĞ±í
-             */
-            show : function(){
-                var self = this;
-                if(self.list == EMPTY){
-                    self.list = self._renderList();
-                    self.iframe = self._createIframe();
-                    self._setWidth(self.get('width'));
+            _createWrapper : function(){
+                var self = this,target = self.target,tpl = self.get('tpl'),selectContainer;
+                if(!S.isString(tpl)){
+                    S.log(LOG_PREFIX + 'å®¹å™¨æ¨¡æ¿ä¸åˆæ³•ï¼');
+                    return false;
                 }
-                var select = self.select,iframe = self.iframe, cls = self.get('clickCls'),listContainer = self.listContainer;
-                DOM.show(listContainer);
-                if(iframe != EMPTY) DOM.show(iframe);
-                //Ôö¼Ó¼¤»îÑùÊ½
-                DOM.addClass(select,cls);
-            },
-            /**
-             * ÉèÖÃ¿í¶È
-             */
-            _setWidth : function(width){
-                var self = this,target = self.target,selectContainer = self.selectContainer,listContainer = self.listContainer;
-                if(width == 'auto'){
-                    var targetClone = target.cloneNode(true);
-                    DOM.css(targetClone,{position:'absolute',top:'-3000px',display:'block'});
-                    DOM.append(targetClone,'body');
-                    width = DOM.width(targetClone);
-                    DOM.remove(targetClone);
-                }
-                if(!S.isNumber(width)) return false;
-                DOM.width(selectContainer,width);
-                listContainer && DOM.width(listContainer,width);
-            },
-            /**
-             * ´´½¨Ä£ÄâÑ¡Ôñ¿ò
-             */
-            _create : function(){
-                var self = this,target = self.target,tpl = self.get('tpl'),text = EMPTY,html,
-                    selectContainer,data;
-                if(!S.isString(tpl)) return false;
-                S.each(DOM.children(target),function(option){
-                   if(DOM.attr(option,'selected')){
-                       text = DOM.text(option);
-                   }
-                });
-                data = {text : text,value : DOM.val(target)};
-                html = S.substitute(tpl,data);
-                selectContainer = DOM.create(html);
+                selectContainer = DOM.create(tpl);
                 DOM.insertAfter(selectContainer,target);
-                self.currentData = S.merge(self.currentData,data);
-                self.selectContainer = selectContainer;
-                self.select =  DOM.children(selectContainer,Select.hook.SELECT);
-                self._setWidth(self.get('width'));
+                return self.selectContainer = selectContainer;
             },
             /**
-             * ÔËĞĞÄ£ÄâÁĞ±í
-             * @return {Object} ListÊµÀı
+             * ç”Ÿæˆä¸ªé€‰æ‹©æ¡†æŒ‰é’®
              */
-            _renderList : function(){
-                var self = this,selectContainer = self.selectContainer,list,
-                    listContainer = DOM.children(selectContainer,Select.hook.LIST_CONTAINER),
-                    data = self._getData(),
-                    value = DOM.val(self.target);
-                list = new List(listContainer,{data : data});
-                list.render();
-                list.select(value);
-                list.on('click',self._listItemClickHandler,self);
-                self.listContainer = listContainer;
-                return list;
+            _initButton : function(){
+                var self = this,container = self.selectContainer,button = EMPTY,
+                    curSelData = self.curSelData;
+                if(!S.isFunction(Button) | S.isEmptyObject(curSelData)) return false;
+                //å®ä¾‹åŒ–æŒ‰é’®
+                button = new Button(container,{text : curSelData.text});
+                button.render();
+                return button;
             },
             /**
-             * ½«Ñ¡Ïî×ª»»³ÉÊı¾İ
+             * å°†é€‰æ‹©æ¡†çš„é€‰é¡¹è½¬æ¢æˆä¸€ä¸ªæ•°ç»„æ•°æ®
              */
             _getData : function(){
-                var self = this,target = self.target,options = DOM.children(target),data = [];
+                var self = this,target = self.target,options = DOM.children(target),data = [],dataItem = {};
                 if(options.length == 0) return false;
                 S.each(options,function(option){
-                    data.push({text : DOM.text(option),value : DOM.val(option)});
+                    dataItem = {text : DOM.text(option),value : DOM.val(option)};
+                    data.push(dataItem);
+                    if(DOM.attr(option,'selected')){
+                        self.curSelData = dataItem;
+                    }
                 });
-                self.data = data;
-                return data;
-            },
-            /**
-             * Êó±ê»¬¹ıÊÂ¼ş¼àÌıÆ÷
-             * @param {Object} ev ÊÂ¼ş¶ÔÏó
-             */
-            _hoverHandler : function(ev){
-                var self = this,type = ev.type,target = self.select,cls = self.get('hoverCls');
-                if(!S.isString(cls)) return false;
-                if(type == 'mouseover'){
-                    DOM.addClass(target,cls);
-                }else if(type == 'mouseout'){
-                    DOM.removeClass(target,cls);
-                }
-            },
-            /**
-             * Êó±êµ¥»÷Ä£ÄâÑ¡Ôñ¿òÊÂ¼ş¼àÌıÆ÷
-             * @param {Object} ev ÊÂ¼ş¶ÔÏó
-             */
-            _clickHandler : function(ev){
-                var self = this,listContainer = self.listContainer;
-                if(self.list == EMPTY || DOM.css(listContainer,'display') == 'none'){
-                    self.show();
-                }else{
-                    self.hide();
-                }
-            },
-            /**
-             * ¼üÅÌÊÂ¼ş¼àÌıÆ÷£¨Ö÷Òª¼àÌıesc¼ü£©
-             */
-            _keyupHandler : function(ev){
-                var self = this,keyCode = ev.keyCode,list = self.list,currentIndex = list.currentIndex;
-                switch(keyCode){
-                    //esc¼ü
-                    case 27:
-                        self.hide();
-                    break;
-                    //tab¼ü
-                    case 9 :
-                        self.show();
-                    break;
-                    //ÏòÏÂ¼ü
-                    case 40 :
-                        currentIndex ++;
-                        list.select(currentIndex);
-                    break;
-                    //ÏòÉÏ¼ü
-                    case 38 :
-                        currentIndex --;
-                        list.select(currentIndex);
-                    break;
-                    //enter¼ü
-                    case 13 :
-                        self.change(currentIndex);
-                    break;
-                }
-            },
-            /**
-             * ¸Ä±äÑ¡Ôñ¿òµÄÖµ
-             */
-            change : function(index){
-                var self = this,select = self.select,textContainer = DOM.children(select,Select.hook.TEXT),
-                    list = self.list,itemData = list.getItemData(index),text,value;
-                if(S.isEmptyObject(itemData)) return false;
-                text = itemData.text;
-                value = itemData.value;
-                //Ñ¡ÔñµÄÖµ·¢Éú¸Ä±ä
-                if(self.currentData.value != value){
-                    //½«ÁĞ±íÑ¡ÖĞÖµĞ´ÈëÊäÈë¿ò
-                    DOM.text(textContainer,text);
-                    DOM.val(self.target,value);
-                    //ÖØĞ´
-                    S.mix(self.currentData,itemData);
-                    //´¥·¢changeÊÂ¼ş
-                    if(Event.trigger) Event.trigger(self.target,'change');
-                }
-                self.hide();
-            },
-            /**
-             * Êó±êµã»÷ÁĞ±íÑ¡Ïîºó´¥·¢µÄÊÂ¼ş¼àÌıÆ÷
-             * @param {Object} ev ÊÂ¼ş¶ÔÏó£¨ev.index£º±»µã»÷µÄÁĞ±íÏîÔÚÁĞ±íÖĞµÄË÷ÒıÖµ£©
-             */
-            _listItemClickHandler : function(ev){
-                var self = this;
-                //¸Ä±äÑ¡Ôñ¿òµÄÖµ
-                self.change(ev.index);
-                //´¥·¢Ô­ÉúÑ¡Ôñ¿òµÄclickÊÂ¼ş
-                if(Event.trigger) Event.trigger(self.target,'click');
-            },
-            /**
-             * ÓÃÓÚĞŞÕıIE6¸¡³ö²ãÎŞ·¨ÕÚ×¡±íµ¥ÔªËØµÄbug
-             * @return {HTMLElement} iframeÔªËØ
-             */
-            _createIframe: function(){
-                var self = this,listContainer = self.listContainer,selectContainer = self.selectContainer,
-                    left = DOM.css(listContainer,'left'), width,height,iframeHtml,iframe;
-                DOM.css(listContainer,{'display':'block','left' : '-3000px'});
-                width = self.get('width'),height = DOM.height(listContainer);
-                DOM.css(listContainer,{'display':'none','left' : left});
-                iframeHtml = S.substitute(IFRAME_TPL,{width : width,height : height});
-                iframe = DOM.create(iframeHtml);
-                DOM.append(iframe,selectContainer);
-                return iframe;
+                return self.data = data;
             }
         });
     return Select;
-}, {requires:['dom','base','event','anim','form/nice/list/list']});
+}, {requires:['dom','event','base','./button']});
