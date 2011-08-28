@@ -143,6 +143,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 }
                 //设置模拟选择框容器的宽度
                 DOM.width(container,width);
+                //设置选择框按钮部分的宽度
                 if(button != EMPTY){
                     button.set('style',{width : width});
                 }
