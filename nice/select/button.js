@@ -63,7 +63,14 @@ KISSY.add('form/nice/select/button',function(S, DOM,Event, Base){
          * 按钮样式
          */
         style : {
-            value : EMPTY
+            value : EMPTY,
+            setter : function(v){
+                var self = this,button = self.button;
+                if(button != EMPTY){
+                    DOM.css(button,v);
+                }
+                return v;
+            }
         }
     };
     //组件方法

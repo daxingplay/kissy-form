@@ -55,6 +55,16 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
          */
         tpl : {
             value : Select.tpl.DEFAULT
+        },
+        /**
+         * 设置模拟选择框的宽度
+         */
+        width : {
+            value : 'auto',
+            setter : function(v){
+                self._setWidth(v);
+                return v;
+            }
         }
     };
     //组件方法
@@ -65,14 +75,17 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
              * 运行
              */
             render : function() {
-                var self = this,target = self.target;
+                var self = this,target = self.target,width;
                 if(!target){
                     S.log(LOG_PREFIX + '目标选择框不存在！');
                     return false;
                 }
+                DOM.hide(target);
                 self._getData();
                 self._createWrapper();
                 self._initButton();
+                width = self.get('width');
+                self._setWidth(width);
             },
             /**
              * 创建模拟选择框容器
@@ -113,6 +126,26 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                     }
                 });
                 return self.data = data;
+            },
+            /**
+             * 设置模拟选择框的宽度
+             * @param {Number | String} width 宽度
+             */
+            _setWidth : function(width){
+                var self = this,target = self.target,container = self.selectContainer,button = self.button;
+                //自动设置宽度，拷贝一份选择框的节点，获取隐藏的选择框的宽度
+                if(width == 'auto'){
+                    var targetClone = target.cloneNode(true);
+                    DOM.css(targetClone,{position:'absolute',top:'-3000px',display:'block'});
+                    DOM.append(targetClone,'body');
+                    width = DOM.width(targetClone);
+                    DOM.remove(targetClone);
+                }
+                //设置模拟选择框容器的宽度
+                DOM.width(container,width);
+                if(button != EMPTY){
+                    button.set('style',{width : width});
+                }
             }
         });
     return Select;
