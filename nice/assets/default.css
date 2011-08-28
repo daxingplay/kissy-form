@@ -102,6 +102,40 @@
     border-color: #FFE0B2;
     background-color: #FFEFD6;
 }
+
+.ks-select{
+    position: relative;
+    z-index: 900;
+    display: inline-block;
+    zoom: 1;
+    *display: inline; /* IE < 8: fake inline-block */
+    letter-spacing: normal;
+    word-spacing: normal;
+    vertical-align: top;
+    _vertical-align: text-bottom;
+}
+.ks-select .ks-select-button{
+    border: 1px solid #8AB6DD;
+    line-height: 22px;
+    height: 22px;
+    background-color: #fff;
+    cursor: pointer;
+    -moz-user-select: none;
+}
+.ks-select .ks-select-button .select-text {
+    display: block;
+    margin-left: 8px;
+    color: #404040;
+}
+.ks-select .ks-select-button .select-icon {
+    display: block;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: url("http://img03.taobaocdn.com/tps/i3/T15zX5XdxuXXXXXXXX-20-121.gif") 0 -81px no-repeat;
+    width: 20px;
+    height: 20px;
+}
 /*------- 选择框美化 END -------*/
 
 /*--------- 表单美化默认模板样式 END ---------*/
