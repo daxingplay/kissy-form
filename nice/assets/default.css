@@ -136,6 +136,12 @@
     width: 20px;
     height: 20px;
 }
+.ks-select .select-button-hover{
+    border: 1px solid #FFAD33;
+}
+.ks-select .select-button-hover .select-icon, .ks-select .select-button-click .select-icon {
+    background-position: 0 -101px;
+}
 .ks-select ul.ks-nice-list{
     position: absolute;
     top: 24px;
@@ -153,7 +159,7 @@
    border: 1px solid #fff;
    padding-left: 5px;
    cursor: pointer;
-   }
+}
 
 /*------- Ñ¡Ôñ¿òÃÀ»¯ END -------*/
 
