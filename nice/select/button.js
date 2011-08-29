@@ -42,7 +42,9 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              */
             cls : {
                 //鼠标滑过
-                HOVER : 'select-button-hover'
+                HOVER : 'select-button-hover',
+                //鼠标点击按钮后
+                CLICK : 'select-button-click'
             },
             /**
              * 支持的事件
@@ -122,6 +124,15 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
                 self.fire(Button.event.RENDER);
             },
             /**
+             * 有click样式，直接移出；如果没有添加click样式（select-button-click）
+             * @return {Button} Button的实例
+             */
+            setClickCls : function(){
+                var self = this,button = self.button,cls = Button.cls.CLICK;
+                DOM[DOM.hasClass(button,cls) && 'removeClass' || 'addClass'](button,cls);
+                return self;
+            },
+            /**
              * 创建选择框按钮
              * @return {HTMLElement} 按钮元素
              */
@@ -156,8 +167,9 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              * @param {Object} ev 事件对象
              */
             _clickHandler : function(ev){
-                var self = this;
-                self.fire(Button.event.CLICK);
+                var self = this,button = self.button;
+                self.setClickCls();
+                self.fire(Button.event.CLICK,{button : button});
             }
         }
     );

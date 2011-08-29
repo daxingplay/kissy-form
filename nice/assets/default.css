@@ -136,7 +136,7 @@
     width: 20px;
     height: 20px;
 }
-.ks-select .select-button-hover{
+.ks-select .select-button-hover,.ks-select .select-button-click{
     border: 1px solid #FFAD33;
 }
 .ks-select .select-button-hover .select-icon, .ks-select .select-button-click .select-icon {
