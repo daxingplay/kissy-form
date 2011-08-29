@@ -79,7 +79,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
              * 运行
              */
             render : function() {
-                var self = this,target = self.target,width;
+                var self = this,target = self.target,width,button;
                 if(!target){
                     S.log(LOG_PREFIX + '目标选择框不存在！');
                     return false;
@@ -88,9 +88,34 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                 self._getData();
                 self._createWrapper();
                 self._initButton();
-                self._initList();
                 width = self.get('width');
                 self._setWidth(width);
+                button = self.button;
+                //监听按钮的单击事件
+                button.on(Button.event.CLICK,self._btnClickHanlder,self);
+            },
+            /**
+             * 显示下列列表
+             */
+            show : function(){
+                var self = this,elList,button = self.button;
+                if(self.list == EMPTY){
+                    self._initList();
+                    self._setWidth(self.get('width'));
+                }
+                elList = self.list.list;
+                DOM.show(elList);
+                //设置按钮的点击样式
+                button.setClickCls();
+            },
+            /**
+             * 隐藏下拉列表
+             */
+            hide : function(){
+                var self = this,elList = self.list.list,button = self.button;
+                DOM.hide(elList);
+                //设置按钮的点击样式
+                button.setClickCls();
             },
             /**
              * 创建模拟选择框容器
@@ -176,6 +201,18 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                     list.set('style',{width : width});
                 }
                 return width;
+            },
+            /**
+             * 按钮点击后触发的事件监听器
+             */
+            _btnClickHanlder : function(ev){
+                var self = this,list = self.list,elList = list.list;
+                if(list == EMPTY){
+                    self.show();
+                    return false;
+                }
+                //如果列表显示则隐藏之，否则显示之
+                self[DOM.css(elList,'display') == 'none' && 'show' || 'hide']();
             }
         });
     return Select;

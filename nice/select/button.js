@@ -168,7 +168,7 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              */
             _clickHandler : function(ev){
                 var self = this,button = self.button;
-                self.setClickCls();
+                //self.setClickCls();
                 self.fire(Button.event.CLICK,{button : button});
             }
         }

@@ -150,6 +150,7 @@
     border: 1px solid #FFAD33;
     border-top: none;
     background-color: #fff;
+    display: none;
 }
 .ks-select ul.ks-nice-list li {
    color: #808080;
