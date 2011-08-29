@@ -3,7 +3,7 @@
  * @author: 剑平（明河）<minghe36@126.com>
  *
  **/
-KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
+KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
     var EMPTY = '', LOG_PREFIX = '[nice-select]:';
     /**
      * @name Select
@@ -15,6 +15,8 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
      * @property {HTMLElement} selectContainer 模拟选择框容器
      * @property {Array} data 从选择框提取的数据集合
      * @property {Object} curSelData 当前选择框的数据
+     * @property {Object} button 选择框按钮实例
+     * @property {Object} list 数据列表实例
      */
     function Select(target, config) {
         var self = this;
@@ -22,6 +24,8 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
         self.selectContainer = EMPTY;
         self.data = [];
         self.curSelData = {};
+        self.button = EMPTY;
+        self.list = EMPTY;
         //超类初始化
         Select.superclass.constructor.call(self, config);
     }
@@ -84,6 +88,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 self._getData();
                 self._createWrapper();
                 self._initButton();
+                self._initList();
                 width = self.get('width');
                 self._setWidth(width);
             },
@@ -102,7 +107,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 return self.selectContainer = selectContainer;
             },
             /**
-             * 生成个选择框按钮
+             * 生成选择框按钮
              * @return {Button} Button的实例
              */
             _initButton : function(){
@@ -112,7 +117,20 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 //实例化按钮
                 button = new Button(container,{text : curSelData.text});
                 button.render();
-                return button;
+                return self.button = button;
+            },
+            /**
+             * 生成数据列表
+             * @return {List} List的实例
+             */
+            _initList : function(){
+                var self = this,selectContainer = self.selectContainer,list,
+                    data = self.data;
+                if(!S.isFunction(List)) return false;
+                //实例化List，data（列表数据）参数必不可少
+                list = new List(selectContainer,{data : data});
+                list.render();
+                return self.list = list;
             },
             /**
              * 将选择框的选项转换成一个数组数据
@@ -137,7 +155,8 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
              * @return {Number} 宽度
              */
             _setWidth : function(width){
-                var self = this,target = self.target,container = self.selectContainer,button = self.button;
+                var self = this,target = self.target,container = self.selectContainer,
+                    button = self.button,list = self.list;
                 //自动设置宽度，拷贝一份选择框的节点，获取隐藏的选择框的宽度
                 if(width == 'auto'){
                     var targetClone = target.cloneNode(true);
@@ -152,8 +171,12 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
                 if(button != EMPTY){
                     button.set('style',{width : width});
                 }
+                //设置下拉列表的宽度
+                if(list != EMPTY){
+                    list.set('style',{width : width});
+                }
                 return width;
             }
         });
     return Select;
-}, {requires:['dom','event','base','./button']});
+}, {requires:['dom','event','base','./button','../list/list']});
