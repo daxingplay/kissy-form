@@ -61,6 +61,7 @@ KISSY.add('form/nice/select/button',function(S, DOM,Event, Base){
         },
         /**
          * 按钮样式
+         * @type Object | String
          */
         style : {
             value : EMPTY,
@@ -71,6 +72,13 @@ KISSY.add('form/nice/select/button',function(S, DOM,Event, Base){
                 }
                 return v;
             }
+        },
+        /**
+         * 是否可用
+         * @type Boolean
+         */
+        disabled : {
+            value : true
         }
     };
     //组件方法

@@ -4,9 +4,7 @@
  *
  **/
 KISSY.add(function(S, DOM, Base, Event, Template) {
-    var EMPTY = '',
-        //控制台
-        console = console || S,LOG_PREFIX = '[nice-list]:';
+    var EMPTY = '', LOG_PREFIX = '[nice-list]:';
     /**
      * @name List
      * @class 数据列表，根据json数据源产生可选择的模拟列表
@@ -17,25 +15,14 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
      * @param {String} container 容器
      * @param {Object} config 配置对象
      * @property {HTMLElement} container 模拟列表的容器
+     * @property {Number} currentIndex 当前选中的子项在列表中的索引值
      * @property {HTMLElement} list 模拟列表元素，一般是ul或ol
      */
     function List(container, config) {
         var self = this;
-        /**
-         * 列表的容器
-         * @type HTMLElement
-         */
         self.container = S.get(container);
-        /**
-         * 列表元素
-         * @type HTMLElement
-         */
+        self.currentIndex = 0;
         self.list = EMPTY;
-        /**
-         * 当前选中的选项索引
-         * @type Number
-         */
-        self.currentIndex = EMPTY;
         //超类初始化
         List.superclass.constructor.call(self, config);
     }
@@ -129,9 +116,9 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
              * 运行
              */
             render : function() {
-                var self = this,container = self.container,style = self.get('style'),list,li;
+                var self = this,container = self.container,list,li;
                 if (container.length == 0) {
-                    console.log(LOG_PREFIX + '列表容器不存在！');
+                    S.log(LOG_PREFIX + '列表容器不存在！');
                     return false;
                 }
                 list = self._create();
@@ -201,7 +188,7 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
              * @param {Object} ev 事件对象
              */
             _clickHandler : function(ev){
-                var self = this,target = ev.target, list = self.list,index,
+                var self = this,target = ev.target,index,
                     value = DOM.attr(target,List.data.VALUE);
                 index = self.select(value);
                 self.fire(List.event.CLICK,{index : index,target : target});

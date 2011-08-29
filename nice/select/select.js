@@ -121,6 +121,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button) {
             _getData : function(){
                 var self = this,target = self.target,options = DOM.children(target),data = [],dataItem = {};
                 if(options.length == 0) return false;
+                //遍历选择框的option标签
                 S.each(options,function(option){
                     dataItem = {text : DOM.text(option),value : DOM.val(option)};
                     data.push(dataItem);
