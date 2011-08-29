@@ -131,11 +131,30 @@
     display: block;
     position: absolute;
     top: 2px;
-    right: 2px;
+    right: 0;
     background: url("http://img03.taobaocdn.com/tps/i3/T15zX5XdxuXXXXXXXX-20-121.gif") 0 -81px no-repeat;
     width: 20px;
     height: 20px;
 }
+.ks-select ul.ks-nice-list{
+    position: absolute;
+    top: 24px;
+    left: 0;
+    z-index: 900;
+    border: 1px solid #FFAD33;
+    border-top: none;
+    background-color: #fff;
+}
+.ks-select ul.ks-nice-list li {
+   color: #808080;
+   font-size: 12px;
+   margin: 2px;
+   line-height: 20px;
+   border: 1px solid #fff;
+   padding-left: 5px;
+   cursor: pointer;
+   }
+
 /*------- 选择框美化 END -------*/
 
 /*--------- 表单美化默认模板样式 END ---------*/
