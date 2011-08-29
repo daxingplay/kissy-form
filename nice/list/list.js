@@ -177,11 +177,13 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
              * 创建列表
              */
             _create : function() {
-                var self = this,container = self.container,data = self.get('data'),tpl = self.get('tpl'),html = EMPTY;
+                var self = this,container = self.container,data = self.get('data'),
+                    tpl = self.get('tpl'),html = EMPTY,elList;
                 if (!S.isArray(data) || data.length == 0 || !S.isString(tpl)) return false;
                 html = Template(tpl).render({data : data});
-                DOM.html(container, html);
-                return self.list = DOM.children(container)[0];
+                elList = DOM.create(html);
+                DOM.append(elList, container);
+                return self.list = elList;
             },
             /**
              * 点击列表选项时触发
