@@ -31,16 +31,24 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              * 模板
              */
             tpl : {
+                //默认模板
                 DEFAULT: '<div class="ks-select-button J_NiceSelect">' +
-                    '<span class="select-text J_SelectText">{text}</span>' +
-                    '<span class="select-icon J_SelectIcon"></span>' +
-                    '</div>'
+                            '<span class="select-text J_SelectText">{text}</span>' +
+                            '<span class="select-icon J_SelectIcon"></span>' +
+                         '</div>'
             },
             /**
              * 样式
              */
             cls : {
+                //鼠标滑过
                 HOVER : 'select-button-hover'
+            },
+            /**
+             * 支持的事件
+             */
+            event : {
+                RENDER : 'render',CLICK : 'click',MOUSEOVER : 'mouseover',MOUSEOUT : 'mouseout'
             }
         });
     //组件参数
@@ -100,13 +108,18 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              * 运行组件
              */
             render : function() {
-                var self = this,container = self.container;
+                var self = this,container = self.container,button;
                 if (!container) {
                     S.log(LOG_PREFIX + '按钮容器不存在！');
                     return false;
                 }
                 self._create();
-                Event.on(self.button,'mouseover mouseout',self._hoverHandler,self);
+                button = self.button;
+                //监听按钮的鼠标滑过移出事件
+                Event.on(button,'mouseover mouseout',self._hoverHandler,self);
+                //监听按钮的单击事件
+                Event.on(button,'click',self._clickHandler,self);
+                self.fire(Button.event.RENDER);
             },
             /**
              * 创建选择框按钮
@@ -132,9 +145,19 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
                 if (!S.isString(cls)) return false;
                 if (type == 'mouseover') {
                     DOM.addClass(target, cls);
+                    self.fire(Button.event.MOUSEOVER);
                 } else if (type == 'mouseout') {
                     DOM.removeClass(target, cls);
+                    self.fire(Button.event.MOUSEOUT);
                 }
+            },
+            /**
+             * 鼠标单击事件监听器
+             * @param {Object} ev 事件对象
+             */
+            _clickHandler : function(ev){
+                var self = this;
+                self.fire(Button.event.CLICK);
             }
         }
     );
