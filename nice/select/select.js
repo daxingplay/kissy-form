@@ -79,7 +79,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
              * 运行
              */
             render : function() {
-                var self = this,target = self.target,width,button;
+                var self = this,target = self.target,width,button,list;
                 if(!target){
                     S.log(LOG_PREFIX + '目标选择框不存在！');
                     return false;
@@ -90,9 +90,10 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                 self._initButton();
                 width = self.get('width');
                 self._setWidth(width);
-                button = self.button;
+                button = self.button,list = self.list;
                 //监听按钮的单击事件
                 button.on(Button.event.CLICK,self._btnClickHanlder,self);
+
             },
             /**
              * 显示下列列表
@@ -116,6 +117,28 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                 DOM.hide(elList);
                 //设置按钮的点击样式
                 button.setClickCls();
+            },
+            /**
+             * 改变选择框的值
+             */
+            change : function(index){
+                var self = this,button = self.button,
+                    //指定索引值的数据
+                    itemData = self.data[index],text,value;
+                if(S.isEmptyObject(itemData)) return false;
+                text = itemData.text;
+                value = itemData.value;
+                //选择的值发生改变
+                if(self.curSelData.value != value){
+                    //改变按钮的文案
+                    button.set('text',text);
+                    DOM.val(self.target,value);
+                    //重写
+                    S.mix(self.curSelData,itemData);
+                    //触发change事件
+                    if(Event.trigger) Event.trigger(self.target,'change');
+                }
+                self.hide();
             },
             /**
              * 创建模拟选择框容器
@@ -155,6 +178,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                 //实例化List，data（列表数据）参数必不可少
                 list = new List(selectContainer,{data : data});
                 list.render();
+                list.on(List.event.CLICK,self._listItemClickHanlder,self);
                 return self.list = list;
             },
             /**
@@ -204,6 +228,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
             },
             /**
              * 按钮点击后触发的事件监听器
+             * @param {Object} ev 事件对象
              */
             _btnClickHanlder : function(ev){
                 var self = this,list = self.list,elList = list.list;
@@ -213,6 +238,18 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                 }
                 //如果列表显示则隐藏之，否则显示之
                 self[DOM.css(elList,'display') == 'none' && 'show' || 'hide']();
+            },
+            /**
+             * 点击列表的选项时触发的事件监听器
+             * @param {Object} ev 事件对象
+             */
+            _listItemClickHanlder : function(ev){
+                debugger;
+                var self = this;
+                //改变选择框的值
+                self.change(ev.index);
+                //触发原生选择框的click事件
+                if(Event.trigger) Event.trigger(self.target,'click');
             }
         });
     return Select;

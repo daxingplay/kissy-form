@@ -51,6 +51,12 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              */
             event : {
                 RENDER : 'render',CLICK : 'click',MOUSEOVER : 'mouseover',MOUSEOUT : 'mouseout'
+            },
+            /**
+             * 钩子
+             */
+            hook : {
+                TEXT : '.J_SelectText'
             }
         });
     //组件参数
@@ -78,7 +84,15 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
          * @type String
          */
         text : {
-            value : EMPTY
+            value : EMPTY,
+            setter : function(v){
+                var self = this,button = self.button,textHook = Button.hook.TEXT,elText;
+                if(button != EMPTY){
+                    elText = DOM.children(button,textHook);
+                    DOM.html(elText,v);
+                }
+                return v;
+            }
         },
         /**
          * 按钮样式
@@ -168,7 +182,6 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              */
             _clickHandler : function(ev){
                 var self = this,button = self.button;
-                //self.setClickCls();
                 self.fire(Button.event.CLICK,{button : button});
             }
         }
