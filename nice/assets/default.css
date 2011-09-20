@@ -1,5 +1,13 @@
 /*--------- 表单美化默认模板样式 START by 剑平（明河）<minghe36@126.com> ---------*/
-
+.g-u {
+    display: inline-block;
+    zoom: 1;
+    *display: inline; /* IE < 8: fake inline-block */
+    letter-spacing: normal;
+    word-spacing: normal;
+    vertical-align: top;
+    _vertical-align: text-bottom;
+}
 /*------- 单选框美化 START -------*/
 .ks-radio {
     background: url('http://img03.taobaocdn.com/tps/i3/T15zX5XdxuXXXXXXXX-20-121.gif') 0 0 no-repeat;
