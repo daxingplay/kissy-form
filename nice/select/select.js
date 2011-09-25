@@ -4,7 +4,7 @@
  *
  **/
 KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button, List) {
-    var EMPTY = '', LOG_PREFIX = '[nice-select]:';
+    var EMPTY = '',$ = KISSY.all,LOG_PREFIX = '[nice-select]:';
 
     /**
      * @name Select
@@ -73,6 +73,18 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                 self._setWidth(v);
                 return v;
             }
+        },
+        /**
+         * 是否开启下拉列表动画（显示/隐藏）
+         */
+        isAnim : {
+            value : true
+        },
+        /**
+         * 动画时长，只有参数isAmin为true时才有效
+         */
+        duration : {
+            value : 0.2
         }
     };
     //组件方法
@@ -101,26 +113,31 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             },
             /**
              * 显示下列列表
+             * return {Select} Select的实例
              */
-            show : function() {
-                var self = this,elList,button = self.button;
+            showList : function() {
+                var self = this,button = self.button;
+                //如果下拉列表不存在，实例化List
                 if (self.list == EMPTY) {
                     self._initList();
                     self._setWidth(self.get('width'));
                 }
-                elList = self.list.list;
-                DOM.show(elList);
+                //显示下拉列表
+                self.animRun(true);
                 //设置按钮的点击样式
                 button.setClickCls();
+                return self;
             },
             /**
              * 隐藏下拉列表
+             * return {Select} Select的实例
              */
-            hide : function() {
-                var self = this,elList = self.list.list,button = self.button;
-                DOM.hide(elList);
+            hideList : function() {
+                var self = this,button = self.button;
+                self.animRun(false);
                 //设置按钮的点击样式
                 button.setClickCls();
+                return self;
             },
             /**
              * 改变选择框的值
@@ -142,7 +159,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                     //触发change事件
                     Event.fire(self.target, 'change');
                 }
-                self.hide();
+                self.hideList();
             },
             /**
              * 创建模拟选择框容器
@@ -237,11 +254,11 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             _btnClickHanlder : function(ev) {
                 var self = this,list = self.list,elList = list.list;
                 if (list == EMPTY) {
-                    self.show();
+                    self.showList();
                     return false;
                 }
                 //如果列表显示则隐藏之，否则显示之
-                self[DOM.css(elList, 'display') == 'none' && 'show' || 'hide']();
+                self[DOM.css(elList, 'display') == 'none' && 'showList' || 'hideList']();
             },
             /**
              * 点击列表的选项时触发的事件监听器
@@ -253,6 +270,20 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                 self.change(ev.index);
                 //触发原生选择框的click事件
                 Event.fire(self.target, 'click');
+            },
+            /**
+             * 动画显示/隐藏下拉列表
+             * @param {Boolean} isShow 是否显示下拉列表
+             */
+            animRun : function(isShow){
+                var self = this,isAnim = self.get('isAnim'),duration = self.get('duration'),
+                    elList = $(self.list.list),listHeight = DOM.height(elList);
+                //用户开启了动画
+                if(isAnim && S.isNumber(duration)){
+                    elList[isShow && 'slideDown' || 'slideUp'](duration);
+                }else{
+
+                }
             }
         });
     return Select;
