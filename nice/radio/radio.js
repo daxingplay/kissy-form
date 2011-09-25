@@ -4,11 +4,9 @@
  *
  **/
 KISSY.add(function(S, DOM, Base, Event) {
-    var EMPTY = '',CHECKED = 'ks-radio-checked',
-        data = {TARGET : 'data-target'},
+    var EMPTY = '', data = {TARGET : 'data-target'},
         //控制台
-        console = console || S,LOG_PREFIX = '[nice-radio]:',
-        DOM = DOM || S.DOM,Base = Base || S.Base,Event = Event || S.Event;
+        console = console || S,LOG_PREFIX = '[nice-radio]:';
     /**
      * @name Radio
      * @class 单选框美化
@@ -105,7 +103,6 @@ KISSY.add(function(S, DOM, Base, Event) {
                     Event.trigger(input,'change');
                     Event.trigger(input,'click');
                 }
-                target.focus();
             },
             /**
              * 创建美化的图片单选框来代替系统原生单选框
@@ -151,8 +148,9 @@ KISSY.add(function(S, DOM, Base, Event) {
              * 单击美化后单选框后事件监听器
              */
             _radioClickHandler : function(ev){
-                var self = this;
-                self.checked(ev.target);
+                var self = this,target = ev.target;
+                self.checked(target);
+                target.focus();
             },
             /**
              * 监听模拟单选框的键盘按起事件
