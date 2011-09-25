@@ -42,6 +42,15 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                 DEFAULT: '<div class="ks-select" tabindex="0" aria-label="点击tab进入选项选择，点击esc退出选择">' +
 
                     '</div>'
+            },
+            /**
+             * 组件支持的事件
+             */
+            event : {
+                //显示下拉列表后
+                SHOW_LIST : 'showList',
+                //隐藏下拉列表后
+                HIDE_LIST : 'hideList'
             }
         });
     //组件参数
@@ -277,12 +286,21 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              */
             animRun : function(isShow){
                 var self = this,isAnim = self.get('isAnim'),duration = self.get('duration'),
-                    elList = $(self.list.list),listHeight = DOM.height(elList);
+                    elList = $(self.list.list);
+                if(!elList.length) return false;
                 //用户开启了动画
                 if(isAnim && S.isNumber(duration)){
-                    elList[isShow && 'slideDown' || 'slideUp'](duration);
+                    elList[isShow && 'slideDown' || 'slideUp'](duration,function(){
+                        _fireEvent();
+                    });
                 }else{
-
+                    _fireEvent();
+                }
+                /**
+                 * 触发显示/隐藏下拉框事件
+                 */
+                function _fireEvent(){
+                    self.fire(Select.event[isShow && 'SHOW_LIST' || 'HIDE_LIST'],{elList : elList});
                 }
             }
         });

@@ -39,6 +39,12 @@
     KISSY.use('form/nice/select/select',function(S,Select){
         var select = new Select('#J_Demo1');
         select.render();
+        select.on(Select.event.SHOW_LIST,function(ev){
+            S.log('下拉列表已经显示','info');
+        });
+        select.on(Select.event.HIDE_LIST,function(ev){
+            S.log('下拉列表已经隐藏','info');
+        })
     })
 </script>
 </body>
