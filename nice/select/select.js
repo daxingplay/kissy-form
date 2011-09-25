@@ -294,6 +294,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                         _fireEvent();
                     });
                 }else{
+                    elList[isShow && 'show' || 'hide']();
                     _fireEvent();
                 }
                 /**
