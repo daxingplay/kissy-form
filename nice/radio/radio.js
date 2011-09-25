@@ -98,11 +98,8 @@ KISSY.add(function(S, DOM, Base, Event) {
                 DOM.addClass(target,checkedCls);
                 DOM.attr(input,'checked',true);
                 //触发单选框的事件
-                //TODO:该方法为明河自定义的方法请看core.js
-                if(Event.trigger){
-                    Event.trigger(input,'change');
-                    Event.trigger(input,'click');
-                }
+                Event.fire(input,'change');
+                Event.fire(input,'click');
             },
             /**
              * 创建美化的图片单选框来代替系统原生单选框

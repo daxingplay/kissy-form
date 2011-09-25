@@ -136,7 +136,7 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
                     //重写
                     S.mix(self.curSelData,itemData);
                     //触发change事件
-                    if(Event.trigger) Event.trigger(self.target,'change');
+                    Event.fire(self.target,'change');
                 }
                 self.hide();
             },
@@ -244,12 +244,11 @@ KISSY.add('form/nice/select/select',function(S, DOM,Event,Base,Button,List) {
              * @param {Object} ev 事件对象
              */
             _listItemClickHanlder : function(ev){
-                debugger;
                 var self = this;
                 //改变选择框的值
                 self.change(ev.index);
                 //触发原生选择框的click事件
-                if(Event.trigger) Event.trigger(self.target,'click');
+                Event.fire(self.target,'click');
             }
         });
     return Select;
