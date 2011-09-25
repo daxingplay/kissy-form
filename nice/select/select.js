@@ -177,7 +177,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             _createWrapper : function() {
                 var self = this,target = self.target,tpl = self.get('tpl'),selectContainer;
                 if (!S.isString(tpl)) {
-                    S.log(LOG_PREFIX + '容器模板不合法！');
+                    S.log(LOG_PREFIX + '容器模板不合法！','error');
                     return false;
                 }
                 selectContainer = DOM.create(tpl);
@@ -236,14 +236,8 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             _setWidth : function(width) {
                 var self = this,target = self.target,container = self.selectContainer,
                     button = self.button,list = self.list;
-                //自动设置宽度，拷贝一份选择框的节点，获取隐藏的选择框的宽度
-                if (width == 'auto') {
-                    var targetClone = target.cloneNode(true);
-                    DOM.css(targetClone, {position:'absolute',top:'-3000px',display:'block'});
-                    DOM.append(targetClone, 'body');
-                    width = DOM.width(targetClone);
-                    DOM.remove(targetClone);
-                }
+                //自动设置宽度
+                if (width == 'auto') width = DOM.width(target);
                 //设置模拟选择框容器的宽度
                 DOM.width(container, width);
                 //设置选择框按钮部分的宽度
