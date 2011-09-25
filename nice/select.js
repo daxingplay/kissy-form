@@ -86,7 +86,11 @@ KISSY.add('form/nice/select',function(S, DOM, Base, Event) {
          * @type Number
          */
         width : {
-            value : 'auto'
+            value : 160,
+            setter : function(v){
+                v && this._setWidth(v);
+                return v;
+            }
         },
         /**
          * 选择框模板
@@ -181,7 +185,8 @@ KISSY.add('form/nice/select',function(S, DOM, Base, Event) {
                 }
                 if(!S.isNumber(width)) return false;
                 DOM.width(selectContainer,width);
-                listContainer && DOM.width(listContainer,width);
+                DOM.width(listContainer,width);
+                DOM.width(self.iframe,width);
             },
             /**
              * 创建模拟选择框
