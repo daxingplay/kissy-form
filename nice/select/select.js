@@ -94,6 +94,12 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
          */
         duration : {
             value : 0.2
+        },
+        /**
+         * 下拉列表数据源，如果为一空数组，那么从目标选择框提取数据
+         */
+        data : {
+            value : []
         }
     };
     //组件方法
@@ -106,10 +112,11 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             render : function() {
                 var self = this,target = self.target,width,button,list;
                 if (!target) {
-                    S.log(LOG_PREFIX + '目标选择框不存在！');
+                    S.log(LOG_PREFIX + '目标元素不存在！');
                     return false;
                 }
-                DOM.hide(target);
+                //如果目标元素是选择框，那么隐藏原生选择框
+                self.isSelect() && DOM.hide(target);
                 self._getData();
                 self._createWrapper();
                 self._initButton();
@@ -171,17 +178,27 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                 self.hideList();
             },
             /**
+             * 目标元素是不是选择框，如果不是则当模拟选择框的容器
+             * @return {Boolean} 
+             */
+            isSelect : function(){
+                var self = this,target = self.target,b = false;
+                if(target.nodeName == 'SELECT') b = true;
+                return b;
+            },
+            /**
              * 创建模拟选择框容器
              * @return {HTMLElement} 选择框容器
              */
             _createWrapper : function() {
-                var self = this,target = self.target,tpl = self.get('tpl'),selectContainer;
+                var self = this,target = self.target,tpl = self.get('tpl'),isSelect = self.isSelect(),selectContainer;
                 if (!S.isString(tpl)) {
                     S.log(LOG_PREFIX + '容器模板不合法！','error');
                     return false;
                 }
                 selectContainer = DOM.create(tpl);
-                DOM.insertAfter(selectContainer, target);
+                //如果是选择框，那么将模拟选择框插在选择框后面，否则插入到目标元素内部
+                DOM[isSelect && 'insertAfter' || 'append'](selectContainer, target);
                 return self.selectContainer = selectContainer;
             },
             /**
@@ -212,21 +229,27 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                 return self.list = list;
             },
             /**
-             * 将选择框的选项转换成一个数组数据
+             * 如果目标元素是选择框，那么将其的选项转换成一个数组数据，如果不是返回配置中data数据源
              * @return {Array} 用于模拟选择框的数据
              */
             _getData : function() {
-                var self = this,target = self.target,options = DOM.children(target),data = [],dataItem = {};
-                if (options.length == 0) return false;
+                var self = this,target = self.target,data = self.get('data'),options = DOM.children(target),dataItem = {};
+                //如果存在数据源，直接取数据源
+                if(S.isArray(data) && data.length > 0){
+                    //设置当前选中数据
+                    self.curSelData = data[0];
+                    return data;
+                }
+                //如果目标元素不是选择框或者选择框无数据直接返回数据源
+                if (!self.isSelect() || options.length == 0) return data;
                 //遍历选择框的option标签
                 S.each(options, function(option) {
                     dataItem = {text : DOM.text(option),value : DOM.val(option)};
                     data.push(dataItem);
-                    if (DOM.attr(option, 'selected')) {
-                        self.curSelData = dataItem;
-                    }
+                    if (DOM.attr(option, 'selected')) self.curSelData = dataItem;
                 });
-                return self.data = data;
+                self.set('data',data);
+                return data;
             },
             /**
              * 设置模拟选择框的宽度
@@ -256,6 +279,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              */
             _btnClickHanlder : function(ev) {
                 var self = this,list = self.list,elList = list.list;
+                //不存在list实例，说明是第一次点击下拉按钮，显示下拉列表
                 if (list == EMPTY) {
                     self.showList();
                     return false;
