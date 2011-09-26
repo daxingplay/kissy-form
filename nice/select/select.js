@@ -79,7 +79,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
         width : {
             value : 'auto',
             setter : function(v) {
-                self._setWidth(v);
+                S.isNumber(v) && this._setWidth(v);
                 return v;
             }
         },
@@ -159,9 +159,9 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              * 改变选择框的值
              */
             change : function(index) {
-                var self = this,button = self.button,
+                var self = this,button = self.button,data = self.get('data'),
                     //指定索引值的数据
-                    itemData = self.data[index],text,value;
+                    itemData = data[index],text,value;
                 if (S.isEmptyObject(itemData)) return false;
                 text = itemData.text;
                 value = itemData.value;
@@ -173,7 +173,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                     //重写
                     S.mix(self.curSelData, itemData);
                     //触发change事件
-                    Event.fire(self.target, 'change');
+                    self.isSelect() && Event.fire(self.target, 'change');
                 }
                 self.hideList();
             },
@@ -220,8 +220,8 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              */
             _initList : function() {
                 var self = this,selectContainer = self.selectContainer,list,
-                    data = self.data;
-                if (!S.isFunction(List)) return false;
+                    data = self.get('data');
+                if (!S.isFunction(List) || !data.length) return false;
                 //实例化List，data（列表数据）参数必不可少
                 list = new List(selectContainer, {data : data});
                 list.render();
@@ -292,11 +292,11 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              * @param {Object} ev 事件对象
              */
             _listItemClickHanlder : function(ev) {
-                var self = this;
+                var self = this,target = self.target;
                 //改变选择框的值
                 self.change(ev.index);
                 //触发原生选择框的click事件
-                Event.fire(self.target, 'click');
+                self.isSelect() && Event.fire(target, 'click');
             },
             /**
              * 动画显示/隐藏下拉列表
