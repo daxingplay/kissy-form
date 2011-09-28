@@ -5,53 +5,54 @@
 <title>美化选择框demo</title>
 <script src="../../kissy/kissy.js"></script>
 <script src="../../kissy/template.js"></script>
-<link href="../../kissy/reset.css" rel="stylesheet" />
-<link href="../assets/default.css" rel="stylesheet" />
+<link href="../../kissy/reset.css" rel="stylesheet"/>
+<link href="../assets/default.css" rel="stylesheet"/>
 <style>
-    .demo-wrapper{
+    .demo-wrapper {
         margin: 20px;
     }
 </style>
 </head>
 <body>
-    <div class="demo-wrapper">
-        <select name="reason" id="J_Demo1">
-            <option value="" selected="selected" data-msg="">请选择退款原因</option>
-            <option selected="selected" value="5">
-                与卖家协商一致退款
-            </option>
-            <option value="6">
-                未按约定时间发货
-            </option>
-            <option value="21">
-                卖家虚假发货
-            </option>
-            <option value="0">
-                其他
-            </option>
-        </select>
-    </div>
-    <div class="demo-wrapper">
-        <div class="J_MenuSelectWrapper"></div>
-    </div>
+<div class="demo-wrapper">
+    <select name="reason" id="J_Demo1">
+        <option value="" selected="selected" data-msg="">请选择退款原因</option>
+        <option selected="selected" value="5">
+            与卖家协商一致退款
+        </option>
+        <option value="6">
+            未按约定时间发货
+        </option>
+        <option value="21">
+            卖家虚假发货
+        </option>
+        <option value="0">
+            其他
+        </option>
+    </select>
+</div>
+<div class="demo-wrapper">
+    <div class="J_MenuSelectWrapper"></div>
+</div>
 <script>
     KISSY.Config.base = '../../../';
-    KISSY.use('form/nice/select/select',function(S,Select){
+    KISSY.use('form/nice/select/select', function(S, Select) {
         var select = new Select('#J_Demo1');
         select.render();
-        select.on(Select.event.SHOW_LIST,function(ev){
-            S.log('下拉列表已经显示','info');
+        select.on(Select.event.SHOW_LIST, function(ev) {
+            S.log('下拉列表已经显示', 'info');
         });
-        select.on(Select.event.HIDE_LIST,function(ev){
-            S.log('下拉列表已经隐藏','info');
+        select.on(Select.event.HIDE_LIST, function(ev) {
+            S.log('下拉列表已经隐藏', 'info');
         });
-        var menuData = [{text : '新旧',value : ''},
-                            {text : '不限',value : '0'},
-                            {text : '全新',value : '2'},
-                            {text : '二手',value : '1'},
-                            {text : '闲置',value : '3'}
-                ],
-        menuSelect = new Select('.J_MenuSelectWrapper',{width : 100,data : menuData});
+        var menuData = [
+            {text : '新旧',value : ''},
+            {text : '不限',value : '0'},
+            {text : '全新',value : '2'},
+            {text : '二手',value : '1'},
+            {text : '闲置',value : '3'}
+        ],
+                menuSelect = new Select('.J_MenuSelectWrapper', {width : 100,data : menuData});
         menuSelect.render();
     })
 </script>

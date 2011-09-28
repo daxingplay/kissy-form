@@ -179,11 +179,11 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             },
             /**
              * 目标元素是不是选择框，如果不是则当模拟选择框的容器
-             * @return {Boolean} 
+             * @return {Boolean}
              */
-            isSelect : function(){
+            isSelect : function() {
                 var self = this,target = self.target,b = false;
-                if(target.nodeName == 'SELECT') b = true;
+                if (target.nodeName == 'SELECT') b = true;
                 return b;
             },
             /**
@@ -193,7 +193,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             _createWrapper : function() {
                 var self = this,target = self.target,tpl = self.get('tpl'),isSelect = self.isSelect(),selectContainer;
                 if (!S.isString(tpl)) {
-                    S.log(LOG_PREFIX + '容器模板不合法！','error');
+                    S.log(LOG_PREFIX + '容器模板不合法！', 'error');
                     return false;
                 }
                 selectContainer = DOM.create(tpl);
@@ -235,7 +235,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
             _getData : function() {
                 var self = this,target = self.target,data = self.get('data'),options = DOM.children(target),dataItem = {};
                 //如果存在数据源，直接取数据源
-                if(S.isArray(data) && data.length > 0){
+                if (S.isArray(data) && data.length > 0) {
                     //设置当前选中数据
                     self.curSelData = data[0];
                     return data;
@@ -248,7 +248,7 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
                     data.push(dataItem);
                     if (DOM.attr(option, 'selected')) self.curSelData = dataItem;
                 });
-                self.set('data',data);
+                self.set('data', data);
                 return data;
             },
             /**
@@ -302,24 +302,24 @@ KISSY.add('form/nice/select/select', function(S, DOM, Event, Base, Anim, Button,
              * 动画显示/隐藏下拉列表
              * @param {Boolean} isShow 是否显示下拉列表
              */
-            animRun : function(isShow){
+            animRun : function(isShow) {
                 var self = this,isAnim = self.get('isAnim'),duration = self.get('duration'),
                     elList = $(self.list.list);
-                if(!elList.length) return false;
+                if (!elList.length) return false;
                 //用户开启了动画
-                if(isAnim && S.isNumber(duration)){
-                    elList[isShow && 'slideDown' || 'slideUp'](duration,function(){
+                if (isAnim && S.isNumber(duration)) {
+                    elList[isShow && 'slideDown' || 'slideUp'](duration, function() {
                         _fireEvent();
                     });
-                }else{
+                } else {
                     elList[isShow && 'show' || 'hide']();
                     _fireEvent();
                 }
                 /**
                  * 触发显示/隐藏下拉框事件
                  */
-                function _fireEvent(){
-                    self.fire(Select.event[isShow && 'SHOW_LIST' || 'HIDE_LIST'],{elList : elList});
+                function _fireEvent() {
+                    self.fire(Select.event[isShow && 'SHOW_LIST' || 'HIDE_LIST'], {elList : elList});
                 }
             }
         });

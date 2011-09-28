@@ -33,9 +33,9 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
             tpl : {
                 //默认模板
                 DEFAULT: '<div class="ks-select-button J_NiceSelect">' +
-                            '<span class="select-text J_SelectText">{text}</span>' +
-                            '<span class="select-icon J_SelectIcon"></span>' +
-                         '</div>'
+                    '<span class="select-text J_SelectText">{text}</span>' +
+                    '<span class="select-icon J_SelectIcon"></span>' +
+                    '</div>'
             },
             /**
              * 样式
@@ -85,11 +85,11 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
          */
         text : {
             value : EMPTY,
-            setter : function(v){
+            setter : function(v) {
                 var self = this,button = self.button,textHook = Button.hook.TEXT,elText;
-                if(button != EMPTY){
-                    elText = DOM.children(button,textHook);
-                    DOM.html(elText,v);
+                if (button != EMPTY) {
+                    elText = DOM.children(button, textHook);
+                    DOM.html(elText, v);
                 }
                 return v;
             }
@@ -132,18 +132,18 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
                 self._create();
                 button = self.button;
                 //监听按钮的鼠标滑过移出事件
-                Event.on(button,'mouseover mouseout',self._hoverHandler,self);
+                Event.on(button, 'mouseover mouseout', self._hoverHandler, self);
                 //监听按钮的单击事件
-                Event.on(button,'click',self._clickHandler,self);
+                Event.on(button, 'click', self._clickHandler, self);
                 self.fire(Button.event.RENDER);
             },
             /**
              * 有click样式，直接移出；如果没有添加click样式（select-button-click）
              * @return {Button} Button的实例
              */
-            setClickCls : function(){
+            setClickCls : function() {
                 var self = this,button = self.button,cls = Button.cls.CLICK;
-                DOM[DOM.hasClass(button,cls) && 'removeClass' || 'addClass'](button,cls);
+                DOM[DOM.hasClass(button, cls) && 'removeClass' || 'addClass'](button, cls);
                 return self;
             },
             /**
@@ -180,9 +180,9 @@ KISSY.add('form/nice/select/button', function(S, DOM, Event, Base) {
              * 鼠标单击事件监听器
              * @param {Object} ev 事件对象
              */
-            _clickHandler : function(ev){
+            _clickHandler : function(ev) {
                 var self = this,button = self.button;
-                self.fire(Button.event.CLICK,{button : button});
+                self.fire(Button.event.CLICK, {button : button});
             }
         }
     );

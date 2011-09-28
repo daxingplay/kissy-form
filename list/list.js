@@ -5,6 +5,7 @@
  **/
 KISSY.add(function(S, DOM, Base, Event, Template) {
     var EMPTY = '', LOG_PREFIX = '[nice-list]:';
+
     /**
      * @name List
      * @class 数据列表，根据json数据源产生可选择的模拟列表
@@ -123,20 +124,20 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
                 }
                 list = self._create();
                 li = DOM.children(list);
-                Event.on(li,'click',self._clickHandler,self);
-                Event.on(li,'mouseover mouseout',self._hoverHandler,self);
+                Event.on(li, 'click', self._clickHandler, self);
+                Event.on(li, 'mouseover mouseout', self._hoverHandler, self);
                 self.fire(List.event.RENDER);
             },
             /**
              * 选中数据项
              * @param {String} value 选项的value值
              */
-            select : function(value){
+            select : function(value) {
                 var self = this,currentCls = List.cls.CURRENT,
                     list = self.list,lis = DOM.children(list);
-                if(S.isString(value)){
-                    S.each(lis,function(li,i){
-                        if(DOM.attr(li,List.data.VALUE) == value){
+                if (S.isString(value)) {
+                    S.each(lis, function(li, i) {
+                        if (DOM.attr(li, List.data.VALUE) == value) {
                             _changeStyle(li);
                             self.currentIndex = i;
                             return true;
@@ -144,10 +145,10 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
                     })
                 }
                 //列表子元素索引
-                else if(S.isNumber(value)){
-                    if(value == lis.length){
+                else if (S.isNumber(value)) {
+                    if (value == lis.length) {
                         value = 0;
-                    }else if(value < 0){
+                    } else if (value < 0) {
                         value = lis.length - 1;
                     }
                     _changeStyle(lis[value]);
@@ -157,18 +158,19 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
                  * 改变选中样式
                  * @param {HTMLElement} li 列表子元素
                  */
-                function _changeStyle(li){
-                    DOM.removeClass(lis,currentCls);
-                    DOM.addClass(li,currentCls);
+                function _changeStyle(li) {
+                    DOM.removeClass(lis, currentCls);
+                    DOM.addClass(li, currentCls);
                 }
+
                 return self.currentIndex;
             },
             /**
              * 获取当前索引的列表子项数据
              * @param {Number} index 列表索引
              */
-            getItemData : function(index){
-                if(!S.isNumber(index)) return false;
+            getItemData : function(index) {
+                if (!S.isNumber(index)) return false;
                 var self = this,data = self.get('data'),itemData;
                 itemData = data[index] || {};
                 return itemData;
@@ -189,25 +191,25 @@ KISSY.add(function(S, DOM, Base, Event, Template) {
              * 点击列表选项时触发
              * @param {Object} ev 事件对象
              */
-            _clickHandler : function(ev){
+            _clickHandler : function(ev) {
                 var self = this,target = ev.target,index,
-                    value = DOM.attr(target,List.data.VALUE);
+                    value = DOM.attr(target, List.data.VALUE);
                 index = self.select(value);
-                self.fire(List.event.CLICK,{index : index,target : target});
+                self.fire(List.event.CLICK, {index : index,target : target});
             },
             /**
              * 鼠标滑过事件监听器
              * @param {Object} ev 事件对象
              */
-            _hoverHandler : function(ev){
+            _hoverHandler : function(ev) {
                 var self = this,type = ev.type,target = ev.target,cls = List.cls.HOVER;
-                if(!S.isString(cls)) return false;
-                if(type == 'mouseover'){
-                    DOM.addClass(target,cls);
-                    self.fire(List.event.ITEM_MOUSEOVER,{target : target});
-                }else if(type == 'mouseout'){
-                    DOM.removeClass(target,cls);
-                    self.fire(List.event.ITEM_MOUSEOUT,{target : target});
+                if (!S.isString(cls)) return false;
+                if (type == 'mouseover') {
+                    DOM.addClass(target, cls);
+                    self.fire(List.event.ITEM_MOUSEOVER, {target : target});
+                } else if (type == 'mouseout') {
+                    DOM.removeClass(target, cls);
+                    self.fire(List.event.ITEM_MOUSEOUT, {target : target});
                 }
             }
         });
