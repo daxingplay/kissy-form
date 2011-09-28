@@ -4,11 +4,9 @@
  *
  **/
 KISSY.add(function(S, DOM, Base, Event) {
-    var EMPTY = '',CHECKED = 'ks-radio-checked',
-        data = {TARGET : 'data-target'},
+    var EMPTY = '', data = {TARGET : 'data-target'},
         //控制台
-        console = console || S,LOG_PREFIX = '[nice-radio]:',
-        DOM = DOM || S.DOM,Base = Base || S.Base,Event = Event || S.Event;
+        console = console || S,LOG_PREFIX = '[nice-radio]:';
     /**
      * @name Radio
      * @class 单选框美化
@@ -50,7 +48,7 @@ KISSY.add(function(S, DOM, Base, Event) {
          * @type String
          */
         tpl : {
-            value : '<span class="g-u ks-radio" rel="{name}"></span>'
+            value : '<span class="g-u ks-radio" tabindex="0" data-label="{label}" aria-label="{label}，按下enter选中该项" rel="{name}"></span>'
         }
     };
     S.mix(Radio,{
@@ -58,7 +56,7 @@ KISSY.add(function(S, DOM, Base, Event) {
              * 样式
              */
             cls : {CHECKED : 'ks-radio-checked',DISABLED : 'ks-radio-disabled'},
-            data : {DISABLED : 'data-disabled',TARGET : 'data-target'}
+            data : {DISABLED : 'data-disabled',TARGET : 'data-target',LABEL : 'data-label'}
     });
     /**
      * 方法
@@ -83,20 +81,44 @@ KISSY.add(function(S, DOM, Base, Event) {
                 });
             },
             /**
+             * 选中指定索引值（元素）的单选框
+             * @param {HTMLElement | Number} target 目标元素
+             */
+            checked : function(target){
+                var self = this,radios = self.target;
+                //如果参数传入的是单选框的索引值，那么从this.target元素数组中取元素
+                if(S.isNumber(target)){
+                    target = radios[target];
+                }
+                var input = DOM.data(target,Radio.data.TARGET),checkedCls = Radio.cls.CHECKED;
+                //如果单选框为禁用状态，直接退出
+                if(DOM.data(target,Radio.data.DISABLED))return false;
+                DOM.removeClass(self.radios,checkedCls);
+                //添加选中样式
+                DOM.addClass(target,checkedCls);
+                DOM.attr(input,'checked',true);
+                //触发单选框的事件
+                Event.fire(input,'change');
+                Event.fire(input,'click');
+            },
+            /**
              * 创建美化的图片单选框来代替系统原生单选框
              */
             _createRadio : function(){
                 var self = this,target = self.target,radioTpl = self.get('tpl'),
-                    name,disabled,html,radio;
+                    name,disabled,html,radio,label;
                 S.each(target,function(item){
                     name = DOM.attr(item,'name');
                     disabled = DOM.attr(item,'disabled');
-                    html = S.substitute(radioTpl,{name : name});
+                    //单选框的label
+                    label = self._getLabel(item);
+                    html = S.substitute(radioTpl,{name : name,label : label});
                     radio = DOM.create(html);
                     //将图片单选框插入到单选框前面
                     DOM.insertBefore(radio,item);
                     //监听图片单选框的单机事件
                     Event.on(radio,'click',self._radioClickHandler,self);
+                    Event.on(radio,'keyup',self._radioKeyupHandler,self);
                     DOM.data(radio,data.TARGET,item);
                     DOM.data(item,data.TARGET,radio);
                     self.radios.push(radio);
@@ -104,21 +126,38 @@ KISSY.add(function(S, DOM, Base, Event) {
                 })
             },
             /**
+             * 获取单选框的label
+             * @param {HTMLElement} radio 单选框元素
+             */
+            _getLabel : function(radio){
+                if(!radio) return false;
+                var dataNameLabel = Radio.data.LABEL,label = EMPTY,elLabel;
+                label = DOM.attr(radio,dataNameLabel);
+                if(!label){
+                    elLabel = DOM.next(radio,'label') || DOM.prev(radio,'label');
+                    if(elLabel){
+                        label = DOM.text(elLabel);
+                    }
+                }
+                return label;
+            },
+            /**
              * 单击美化后单选框后事件监听器
              */
             _radioClickHandler : function(ev){
-                var self = this,target = ev.target,input = DOM.data(target,Radio.data.TARGET),
-                    checkedCls = Radio.cls.CHECKED;
-                if(DOM.data(target,Radio.data.DISABLED))return false;
-                DOM.removeClass(self.radios,checkedCls);
-                //添加选中样式
-                DOM.addClass(target,checkedCls);
-                DOM.attr(input,'checked',true);
-                //触发单选框的事件
-                //TODO:该方法为明河自定义的方法请看core.js
-                if(Event.trigger){
-                    Event.trigger(input,'change');
-                    Event.trigger(input,'click');
+                var self = this,target = ev.target;
+                self.checked(target);
+                target.focus();
+            },
+            /**
+             * 监听模拟单选框的键盘按起事件
+             * @param ev
+             */
+            _radioKeyupHandler : function(ev){
+                var self = this,target = ev.target,keyCode = ev.keyCode;
+                //按下enter键
+                if(keyCode == 13){
+                    self.checked(target);
                 }
             },
             /**
@@ -134,7 +173,5 @@ KISSY.add(function(S, DOM, Base, Event) {
                 if(!DOM.attr(radioTarget,'disabled')) DOM.attr(radioTarget,'disabled',true);
             }
         });
-    S.namespace('nice');
-    S.nice.Radio = Radio;
     return Radio;
 }, {requires:['dom','base','event']});
