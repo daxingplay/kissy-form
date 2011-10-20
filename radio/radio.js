@@ -7,6 +7,7 @@ KISSY.add(function(S, DOM, Base, Event) {
     var EMPTY = '', data = {TARGET : 'data-target'},
         //øÿ÷∆Ã®
         console = console || S,LOG_PREFIX = '[nice-radio]:';
+		//≤‚ ‘
 
     /**
      * @name Radio
