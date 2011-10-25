@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>消息提示组件demo</title>
+<link href="http://www.36ria.com/demo/assets/demo.css" type="text/css" rel="stylesheet" />
+<script src="../../kissy/kissy.js"></script>
+<script src="../../kissy/template.js"></script>
+<link href="../../kissy/reset.css" rel="stylesheet"/>
+<link href="../uploader.css" rel="stylesheet"/>
+<style>
+    .demo-wrapper{
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<header class="grid">
+    <h1 id="logo" class="g-u"><a href="http://www.36ria.com/"><img src="http://www.36ria.com/style/images/logo.png" alt="RIA之家" /></a></h1>
+    <hgroup class="g-u">
+        <h2><a href="" target="_blank">消息提示组件demo</a></h2>
+        <p>作者：<a href="http://www.36ria.com/author/minghe" target="_blank">明河共影</a></p>
+    </hgroup>
+</header>
+
+<article id="main">
+    <h4>iframe异步文件上传组件</h4>
+    <p>为了简化demo去掉了上传验证类的初始化，目前组件效果和可用性上还有些问题，代码和API还在重构中，欢迎反馈问题:)</p>
+    <div class="demo-wrapper">
+        <form action="test.php">
+        <a id="J_UploaderBtn" class="g-u uploader-button uploader-button-focus" data-config='{"action":"upload.php","data":{"dir":"files/"},"inputName":"Filedata","urlsInputName":"attachments"}' href="#uploaderFile()">
+                    选择要上传的图片
+        </a>
+        <input type="hidden" name="attachments" value="" />
+        <ul id="J_UploaderQueue">
+
+        </ul>
+
+        </form>
+    </div>
+    <script>
+        KISSY.Config.base = '../../../';
+        KISSY.use('form/uploader/renderUploader', function(S, RenderUploader) {
+            var renderUploader = new RenderUploader('#J_UploaderBtn','#J_UploaderQueue');
+        })
+    </script>
+</article>
+</body>
+</html>

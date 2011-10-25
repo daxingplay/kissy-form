@@ -1,0 +1,163 @@
+.clearfix:before, .clearfix:after {
+    content: "";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    zoom: 1;
+    clear:both\9;
+}
+
+.f-r {
+    float: right;
+}
+
+.f-l {
+    float: left;
+}
+.sprite {
+    background: url("http://img03.taobaocdn.com/tps/i3/T1he85XfRIXXXXXXXX-24-160.png") 0 0 no-repeat;
+}
+a{
+    color: #3366CC;
+    text-decoration: none;
+}
+/*--------- 文件上传 START ---------*/
+.uploader-button {
+    border: 1px solid #C4DAED;
+    font-size: 12px;
+    text-align: center;
+    line-height: 24px;
+    color: black;
+    display: block;
+    position: relative;
+    width: 110px;
+    z-index: 500;
+    margin-right:10px;
+    /*渐变*/
+    background: -webkit-gradient(linear, left top, left bottom, from(#FDFEFE), to(#DFE7EF));
+    background: -moz-linear-gradient(top, #FDFEFE, #DFE7EF);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#FDFEFE', endColorstr = '#DFE7EF');
+}
+
+.uploader-button-hover, .uploader-button:hover {
+    text-decoration: none;
+    color: black;
+    background: -webkit-gradient(linear, left top, left bottom, from(#DFE7EF), to(#FDFEFE));
+    background: -moz-linear-gradient(top, #DFE7EF, #FDFEFE);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#DFE7EF', endColorstr = '#FDFEFE');
+}
+
+.uploader-button:active {
+    background: #DFE7EF;
+    filter: none;
+}
+
+.uploader-button-disabled {
+    border: 1px solid #BFBFBF;
+    color: #404040;
+    background: -webkit-gradient(linear, left top, left bottom, from(#FAFAFA), to(#E5E5E5));
+    background: -moz-linear-gradient(top, #FAFAFA, #E5E5E5);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#FAFAFA', endColorstr = '#E5E5E5');
+}
+
+.uploader-button input {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    cursor: pointer;
+    height: 25px;
+    width: 110px;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity = 0);
+    position: absolute;
+    font-size: 400px\0/;
+}
+*html .uploader-button input {
+    font-size: 400px;
+}
+*+html .uploader-button input {
+    font-size: 400px;
+}
+.ks-ajax-uploader-input-container {
+    display: block;
+    height: 26px;
+    width: 110px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    z-index: 300;
+}
+
+.ks-ajax-uploader-input {
+    cursor: pointer;
+    font-family: sans-serif;
+    height: 400px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity = 0);
+}
+
+.ks-uploader-queue {
+    color: #404040;
+    width: 200px;
+    margin-top:10px;
+}
+.ks-uploader-queue li{
+    margin-top:5px;
+}
+.ks-uploader-queue .file-icon {
+    background-position: 0 -70px;
+    width: 12px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+*html .ks-uploader-queue .file-icon {
+	background:url(http://img02.taobaocdn.com/tps/i2/T1XuOuXnBBXXXXXXXX-12-16.png) 0 0 no-repeat;
+}
+
+.ks-uploader-queue .uploader-controller {
+    margin-left: 5px;
+    display: none;
+}
+
+.ks-uploader-queue .loading {
+    background: url("http://img01.taobaocdn.com/tps/i1/T1F5tVXjRfXXXXXXXX-16-16.gif") no-repeat scroll 0 1px transparent;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+}
+
+.rf-uploader .ks-uploader-queue li {
+    margin-left: 0;
+    margin-bottom: 10px;
+    line-height: 16px;
+}
+
+.rf-uploader .ks-uploader-queue li div {
+    margin-top: 2px;
+
+}
+
+.rf-uploader .ks-uploader-queue li div.file-icon {
+    margin-top: 0;
+}
+.rf-uploader .uploader-state,.uploader .uploader-state{
+    font-size:12px;
+    margin-top:6px;
+    color:#999999;
+}
+/*--------- 文件上传 END ---------*/

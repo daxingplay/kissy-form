@@ -1,0 +1,28 @@
+.ks-auth-tip {
+    background: url("http://img02.taobaocdn.com/tps/i2/T1XQlVXchEXXXXXXXX-18-384.gif") -100px -100px no-repeat #fff;
+    border-style: solid;
+    border-width: 1px;
+    padding: 2px 0 2px 23px;
+    letter-spacing: 0;
+    line-height: 18px;
+    display: none;
+    font-size: 12px;
+    max-width: 700px;
+}
+
+.ks-auth-error {
+    background-color: #FFF2F2;
+    background-position: 3px 3px;
+    border-color: #FF8080;
+}
+
+.ks-auth-warn {
+    background-color: #E5F5FF;
+    background-position: 3px -146px;
+    border-color: #40B3FF;
+}
+.ks-auth-cue{
+    background-color: #FFFFE5;
+    background-position: 3px -197px;
+    border-color: #FFCC7F;
+}
