@@ -1,83 +1,94 @@
 /**
  * @fileoverview 运行文件上传组件
- * @author: 剑平（明河）<minghe36@126.com>
+ * @author: 剑平（明河）<minghe36@126.com>,紫英<>
  *
  **/
-KISSY.add(function(S,DOM,Uploader,Button,Queue,Auth) {
+KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
+    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[renderUploader]:';
     /**
      * 解析组件在页面中data-config成为组件的配置
      * @param {String} hook 组件钩子
      * @param {String} dataConfigName 配置名
      * @return {Object}
      */
-    S.parseComConfig = function(hook,dataConfigName){
+    function parseConfig(hook, dataConfigName) {
         var config = {},sConfig,DATA_CONFIG = dataConfigName || 'data-config';
-        sConfig = DOM.attr(hook,DATA_CONFIG);
-        try{
-           config = JSON.parse(sConfig);
-        }catch(err){
-            S.log('请检查'+DATA_CONFIG+'的格式是否符合规范');
+        sConfig = $(hook).attr(DATA_CONFIG);
+        if(!S.isString(sConfig)) return {};
+        try {
+            config = JSON.parse(sConfig);
+        } catch(err) {
+            S.log(LOG_PREFIX + '请检查'+hook+'上' + DATA_CONFIG + '属性内的json格式是否符合规范！');
         }
         return config;
-    };
-
+    }
     /**
      * @name RenderUploader
      * @class 运行文件上传组件
      * @constructor
-     * @param {String | HTMLElement} target 目标元素
+     * @param {String | HTMLElement} buttonTarget 上传按钮目标元素
      * @param {String | HTMLElement} queueTarget 文件队列目标元素
      * @param {Object} config 配置
      */
-    function RenderUploader(target,queueTarget,config){
+    function RenderUploader(buttonTarget, queueTarget, config) {
         var self = this;
-        self.target = S.get(target);
-        self.queueTarget = S.get(queueTarget);
-        self.config = config || S.parseComConfig(target);
-        self.uploader = {};
+        config = config || parseConfig(buttonTarget);
+        //超类初始化
+        RenderUploader.superclass.constructor.call(self, config);
+        self.set('buttonTarget',buttonTarget);
+        self.set('queueTarget',queueTarget);
         self._init();
     }
-    S.augment(RenderUploader,{
+
+    S.extend(RenderUploader, Base, {
             /**
-             * 初始化
+             * 初始化组件
              */
-            _init : function(){
-                var self = this, button = self._initButton(),queue = self._initQueue(),uploader;
-                //配置参数增加上传按钮实例和上传队列实例
-                S.mix(self.config, {button : button,queue : queue});
-                //实例化上传组件
-                uploader = new Uploader(self.config);
-                uploader.render();
-                self.uploader = uploader;
+            _init : function() {
+                var self = this,
+                    button = self._initButton(),
+                    queue = self._initQueue();
+                self.set('button',button);
+                self.set('queue',queue);
             },
             /**
              * 初始化模拟的上传按钮
-             * @return {UploadButton}
+             * @return {Button}
              */
             _initButton : function(){
-                var self = this,buttonConfig = {};
+                var self = this,urlsInputName = self.get('urlsInputName'),target = self.get('buttonTarget'),buttonConfig = {};
                 //配置下文件路径隐藏域的name名
-                if (self.config.urlsInputName) buttonConfig.urlsInputName = self.config.urlsInputName;
+                if (urlsInputName) buttonConfig.urlsInputName = urlsInputName;
                 //实例化上传按钮
-                return new Button(self.target, buttonConfig);
+                return new Button(target, buttonConfig);
             },
             /**
              * 初始化上传文件队列
              * @return {Queue}
              */
             _initQueue : function(){
-                var self = this;
-                //上传队列实例化
-                return new Queue(self.queueTarget);
-            },
-            /**
-             * 初始化上传凭证验证
-             * @param {AjaxUploader} ajaxUploader AjaxUploader的实例
-             */
-            _initAuth : function(ajaxUploader){
-                var tip = new Tip(btn, {autoRender:true,container : DOM.next(DOM.parent(hook.BUTTON), hook.TIP_CONTAINER)});
-                return new Auth({ajaxUploader : ajaxUploader,tip : tip});
+                var self = this,target = self.get('queueTarget');
+                return new Queue(target);
+            }
+        }, {
+            ATTRS : {
+                /**
+                 * 按钮目标元素
+                 */
+                buttonTarget : {value : EMPTY},
+                /**
+                 * 队列目标元素
+                 */
+                queueTarget : {value : EMPTY},
+                /**
+                 * Button（上传按钮）的实例
+                 */
+                button : {value : EMPTY},
+                /**
+                 * Queue（上传队列）的实例
+                 */
+                queue : {value : EMPTY}
             }
         });
     return RenderUploader;
-}, {requires:['dom','./uploader','./button','./queue','./auth']});
+}, {requires:['base','node','./base','./button/base','./queue/base']});
