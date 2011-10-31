@@ -1,10 +1,9 @@
 /**
  * @fileoverview 运行文件上传组件
- * @author: 剑平（明河）<minghe36@126.com>,紫英<>
- *
+ * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
 KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
-    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[renderUploader]:';
+    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploaderRender]:';
     /**
      * 解析组件在页面中data-config成为组件的配置
      * @param {String} hook 组件钩子
@@ -50,6 +49,8 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
                     queue = self._initQueue();
                 self.set('button',button);
                 self.set('queue',queue);
+                var uploader = new Uploader();
+                uploader.render();
             },
             /**
              * 初始化模拟的上传按钮

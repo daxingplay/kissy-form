@@ -60,6 +60,10 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
                 RENDER : 'render',
                 //开始上传
                 UPLOAD_START : 'uploadStart',
+                // 被逼等待时候出发
+                UPLOAD_WAITING: 'uploadWaiting',
+                // 上传中
+                UPLOADING: 'uploading',
                 //上传完成（在上传成功或上传失败后都会触发）
                 UPLOAD_COMPLETE :'uploadComplete',
                 //上传成功
@@ -75,9 +79,16 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
              * 获取自动递增的id（主要用于iframe）
              * @return {String}
              */
-            getIframeId : function() {
-                AjaxUploader.ID++;
-                return 'ajax-uploader-iframe-' + AjaxUploader.ID;
+            getIframeId : function(id) {
+                // AjaxUploader.ID++;
+                // return 'ajax-uploader-iframe-' + AjaxUploader.ID;
+                return 'ajax-uploader-iframe-' + id;
+            },
+            /**
+             * 获取当前file的id，用来获取唯一的queue
+             */
+            getFileId : function(){
+            	return 'ks-ajax-file-' + AjaxUploader.ID
             }
         });
     /**
@@ -197,11 +208,25 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
                     form = self._createForm(iframe),
                     button = self.get('button'),inputName = self.get('inputName');
                 if (!button.fileInput) return false;
+                
+                var fileId = self._queueAdd({
+                	'name':fileName
+                });
+                
+                if(typeof fileId === 'undefined'){
+                	S.log(LOG_PREFIX + 'queue added error, perhaps queue full.');
+                	return false;
+                }
+                
                 //文件上传前触发的事件
-                self.fire(AjaxUploader.event.UPLOAD_START, {'fileName' : fileName});
+                self.fire(AjaxUploader.event.UPLOAD_START, {
+                	'fileName' : fileName,
+                	'fileId': fileId
+                });
                 //是否取消上传
                 if(!self.get('isAllowUpload')){
                     console.log(LOG_PREFIX + 'isAllowUpload为false，阻止文件上传！');
+                    queue.files[fileId].status = 'canceled';
                     return false;
                 }
                 self._queueAdd({'name':fileName});
@@ -209,14 +234,129 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
                 //设置输入框的name值
                 button.set('name', inputName);
                 //提交表单
-                form.submit();
-                //文件名
-                fileName = fileName || DOM.val(button.fileInput);
-                //获取服务器端返回的数据
-                self._getResponse(iframe, fileName);
-                self._removeForm();
+                self.send(fileId, ev.eventTarget);
                 button.resetInput();
                 return self;
+            },
+            uploadWaiting: function(){
+            	var self = this,
+	            	queue = self.get('queue'),
+	            	maxPerTime = self.get('max');
+	            // 先判断一次应该会有一小点性能提升
+	            if(maxPerTime){
+	            	var waitingQueue = queue.getQueue('waiting');
+	            	if(waitingQueue.length){
+	        			self.send(waitingQueue[0]);
+	        			S.log(LOG_PREFIX + 'Uploading waiting file ' + waitingQueue[0]);
+	        		}
+	            }
+            },
+            /**
+             * 提交，后期可以融合xhr2
+             */
+            send: function(fileId, ev){
+            	var self = this,
+            		maxPerTime = self.get('max'),
+            		queue = self.get('queue'),
+            		// button = self.get('button'),
+            		iframe = DOM.get('#' + AjaxUploader.getIframeId(fileId));
+            	queue.files[fileId].status = 'waiting';
+            	// FOR DEBUG ONLY.
+            	// S.log(queue.files, 'dir');
+            	if(maxPerTime){
+            		var uploadingQueue = queue.getLength('uploading');
+            		if(uploadingQueue >= maxPerTime){
+            			self.fire(AjaxUploader.event.UPLOAD_WAITING, {
+            				'fileId': fileId
+            			});
+            			S.log(LOG_PREFIX + 'Uploading queue full, waiting...');
+            			return false;
+            		}
+            		// 优先上传等待队列中的文件
+            		// var waitingQueue = queue.getQueue('waiting');
+            		// if(waitingQueue.length){
+            			// S.log(LOG_PREFIX + 'Uploading file ' + fileId);
+            			// self.send(waitingQueue[0]);
+            			// return false;
+            		// }
+            		// self.uploadWaiting();
+            	}
+            	// else{
+        		queue.files[fileId].status = 'uploading';
+        		self.fire(AjaxUploader.event.UPLOADING, {
+        			'fileId': fileId
+        		})
+            	if(self.method == 'iframe'){
+            		self.form[fileId].submit();
+            		//获取服务器端返回的数据
+                	self._getResponse(iframe, fileId);
+                	self._removeForm(fileId);
+            	}else{
+            		var xhr = new XMLHttpRequest(),
+            			formData = new FormData();
+            		if(xhr.upload){
+            			xhr.upload.addEventListener('progress', function(e){
+            				if(e.lengthComputable){
+            					// S.log(e, 'dir');
+            					self.fire('progress', {
+	            					'fileId': fileId,
+	            					'loaded': e.loaded,
+	            					'total': e.total
+	            				});
+            				}
+            			}, false);
+            			
+            			// xhr.onreadstatechange = function(e){
+            				// if(xhr.readyState == 4){
+            					// var response = {
+            							// 'status': 3
+            						// };
+        						// try{
+        							// response = S.JSON.parse(xhr.responseText);
+        						// }catch(e){
+        							// S.log(LOG_PREFIX + 'Xhr response format error.');
+        						// }
+        						// S.log(response, 'dir');
+            					// if(xhr.status == 200){
+            						// self._processResponse(response, fileId);
+            					// }
+            					// self.fire(AjaxUploader.event.UPLOAD_COMPLETE, {'data' : response, 'fileId': fileId});
+            				// }
+            			// }
+            			
+            			xhr.onload = function(e){
+            				var response = {
+        							'status': 3
+        						};
+    						try{
+    							response = S.JSON.parse(xhr.responseText);
+    						}catch(e){
+    							S.log(LOG_PREFIX + 'Xhr response format error.');
+    						}
+    						// S.log(response, 'dir');
+        					if(xhr.status == 200){
+        						self._processResponse(response, fileId);
+        					}
+        					self.fire(AjaxUploader.event.UPLOAD_COMPLETE, {'data' : response, 'fileId': fileId});
+            			}
+            			
+            			var data = self.get('data'),
+            				button = self.get('button'),
+            				files = ev.target.files || ev.dataTransfer.files,
+            				file = files[0];
+            			// bulid form data
+            			for(var i in data){
+            				formData.append(i, data[i]);
+            			}
+            			formData.append(button.get('name'), file);
+            			// sending
+            			xhr.open("POST", self.get('action'), true);
+						// xhr.setRequestHeader(button.get('name'), file.name);
+						xhr.send(formData);
+            		}
+            	}
+            		
+            	// }
             },
             /**
              * 初始化按钮实例
@@ -328,8 +468,10 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
                         // response is a xml document
                         response = doc;
                     }
-                    self._processResponse(response);
-                    self.fire(AjaxUploader.event.UPLOAD_COMPLETE, {'data' : response,'fileName' : fileName});
+                    self._processResponse(response, fileId);
+                    self.fire(AjaxUploader.event.UPLOAD_COMPLETE, {'data' : response, 'fileId': fileId});
+                    // 开始传等待队列中的下一个文件。
+                    self.uploadWaiting();
                     // 修正IE页面最小内容填充的bug，导致
                     iframe.src = "javascript:'<html></html>';";
                     DOM.remove(iframe);
@@ -348,10 +490,18 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
              * 处理服务器端返回的数据
              * @param {Object} response 结果集
              */
-            _processResponse : function(response) {
-                var self = this,dataType = self.get('dataType'),fileData,success,
-                    queue = self.get('queue'),files = queue.files,
-                    button = self.get('button'),urlsInput = button.urlsInput,division = button.get('urlDivision'),urls = [];
+            _processResponse : function(response, fileId) {
+                var self = this,
+                	dataType = self.get('dataType'),
+                	result,
+                	fileData,
+                	status,
+                    queue = self.get('queue'),
+                    files = queue.files,
+                    button = self.get('button'),
+                    urlsInput = button.urlsInput,
+                    division = button.get('urlDivision'),
+                    urls = [];
                 //TODO:目前只支持json
                 if (dataType == 'json') {
                     success = response.success;
@@ -370,15 +520,27 @@ KISSY.add(function(S, DOM, Base, Event, JSON) {
                         });
                         //向文件路径数组添加文件url
                         S.each(queue.files, function(file) {
-                            if (file.url) urls.push(file.url);
+                            if (file && file.url && file.status == 'success'){
+                            	urls.push(file.url);
+                            }
                         });
                         DOM.val(urlsInput, urls.join(division));
-                        self.fire(AjaxUploader.event.UPLOAD_SUCCESS, {'data' : response,'urls' : urls});
+                        self.fire(AjaxUploader.event.UPLOAD_SUCCESS, {
+                        	'data' : response, 
+                        	'url' : queue.files[fileId].url, 
+                        	'urls' : urls, 
+                        	'fileId': fileId
+                        });
                     } else {
                         //上传失败移除文件
+                        S.log(LOG_PREFIX + 'error:' + status);
                         var lastFileName = queue.files[queue.files.length - 1].name;
-                        queue.remove(lastFileName);
-                        self.fire(AjaxUploader.event.UPLOAD_ERROR, {'data' : response,'msg' : response.msg});
+                        // FIXME
+                        self.fire(AjaxUploader.event.UPLOAD_ERROR, {
+                        	'data' : response,
+                        	'fileId': fileId
+                        });
+                        // queue.remove(lastFileName);
                     }
                 }
             }
