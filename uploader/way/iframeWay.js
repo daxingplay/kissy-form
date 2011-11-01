@@ -3,7 +3,7 @@
  * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
 KISSY.add(function(S,Node,Base) {
-    var EMPTY = '',$ = Node.all;
+    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeWay]:',ID_PREFIX = 'ks-uploader-iframe';
     /**
      * @name IframeWay
      * @class iframe方案上传
@@ -17,13 +17,116 @@ KISSY.add(function(S,Node,Base) {
         IframeWay.superclass.constructor.call(self,config);
     }
     S.mix(IframeWay,/**@lends IframeWay*/ {
-            
+        /**
+         * 会用到的html模板
+         */
+        tpl : {
+            IFRAME : '<iframe src="javascript:false;" name="{id}" id="{id}" />',
+            FORM : '<form method="post" enctype="multipart/form-data" action="{action}" target="{target}">{hiddenInputs}</form>',
+            HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
+        }
     });
     //继承于Base，属性getter和setter委托于Base处理
     S.extend(IframeWay, Base, /** @lends IframeWay.prototype*/{
-        
-    },{ATTRS : /** @lends IframeWay*/{
+            /**
+             * 运行
+             */
+            render : function(){
 
+            },
+            upload : function(){
+                var self = this,
+                    iframe = self._createIframe(),
+                    form = self._createForm();
+            },
+            /**
+             * 将参数数据转换成hidden元素
+             * @param {Object} data 对象数据
+             * @return {String} hiddenInputHtml hidden元素html片段
+             */
+            dataToHidden : function(data){
+                if(!S.isObject(data) || S.isEmptyObject(data)){
+                    S.log(LOG_PREFIX + 'data参数不是对象或者为空！');
+                    return false;
+                }
+                var self = this,hiddenInputHtml = EMPTY,
+                    //hidden元素模板
+                    tpl = self.get('tpl'),hiddenTpl = tpl.HIDDEN_INPUT;
+                if (!S.isString(hiddenTpl)) return false;
+                for (var k in data) {
+                    hiddenInputHtml += S.substitute(hiddenTpl, {'name' : k,'value' : data[k]});
+                }
+                return hiddenInputHtml;
+            },
+            /**
+             * 创建一个空的iframe，用于文件上传表单提交后返回服务器端数据
+             * @return {NodeList}
+             */
+            _createIframe : function(){
+                var self = this,
+                    //iframe的id
+                    id = self.get('id'),
+                    //iframe模板
+                    tpl = self.get('tpl'),iframeTpl = tpl.IFRAME,
+                    iframe;
+                if (!S.isString(iframeTpl)){
+                    S.log(LOG_PREFIX + 'iframe的模板不合法！');
+                    return false;
+                }
+                if (!S.isString(id)){
+                    S.log(LOG_PREFIX + 'id必须存在且为字符串类型！');
+                    return false;
+                }
+                //创建处理上传的iframe
+                iframe = S.substitute(tpl.IFRAME, { 'id' : id });
+                return $(iframe);
+            },
+            /**
+             * 创建文件上传表单
+             * @return {NodeList}
+             */
+            _createForm : function(){
+                var self = this,
+                    //iframe的id
+                    id = self.get('id'),
+                    //form模板
+                    tpl = self.get('tpl'),formTpl = tpl.FORM,
+                    //想要传送给服务器端的数据
+                    data = self.get('data'),
+                    //服务器端处理文件上传的路径
+                    action = self.get('action'),
+                    hiddens,form = EMPTY;
+                if (!S.isString(formTpl)){
+                    S.log(LOG_PREFIX + 'form模板不合法！');
+                    return false;
+                }
+                if (!S.isObject(data)){
+                    S.log(LOG_PREFIX + 'data参数不合法！');
+                    return false;
+                }
+                if (!S.isString(action)){
+                    S.log(LOG_PREFIX + 'action参数不合法！');
+                    return false;
+                }
+                hiddens = self.dataToHidden(data);
+                if(hiddens == EMPTY) return false;
+                form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInput' : hiddens});
+                return $(form);
+            }
+
+    },{ATTRS : /** @lends IframeWay*/{
+            /**
+             * iframe方案会用到的html模板，一般不需要修改
+             */
+            tpl : {value : IframeWay.tpl},
+            /**
+             * 创建的iframeid
+             */
+            id : {value : ID_PREFIX + S.guid()},
+            /**
+             * 传送给服务器端的参数集合（会被转成hidden元素post到服务器端）
+             */
+            data : {value : {}}
     }});
     
     return IframeWay;
