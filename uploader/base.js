@@ -28,6 +28,7 @@ KISSY.add(function(S, Base, Node,IframeWay,AjaxWay) {
             render : function(){
                 var self = this,UploadWay = self.getUploadWay();
                 if(!UploadWay) return false;
+
             },
             /**
              * 上传文件
