@@ -3,7 +3,7 @@
  * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
 KISSY.add(function(S,Node,Base) {
-    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeWay]:',ID_PREFIX = 'ks-uploader-iframe';
+    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeWay]:',ID_PREFIX = 'ks-uploader-iframe-';
     /**
      * @name IframeWay
      * @class iframe方案上传
@@ -21,7 +21,7 @@ KISSY.add(function(S,Node,Base) {
          * 会用到的html模板
          */
         tpl : {
-            IFRAME : '<iframe src="javascript:false;" name="{id}" id="{id}" />',
+            IFRAME : '<iframe src="javascript:false;" name="{id}" id="{id}" border="no" width="1" height="1" style="display: none;" />',
             FORM : '<form method="post" enctype="multipart/form-data" action="{action}" target="{target}">{hiddenInputs}</form>',
             HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
         }
@@ -35,9 +35,8 @@ KISSY.add(function(S,Node,Base) {
 
             },
             upload : function(){
-                var self = this,
-                    iframe = self._createIframe(),
-                    form = self._createForm();
+                var self = this;
+                self._create();
             },
             /**
              * 将参数数据转换成hidden元素
@@ -110,8 +109,20 @@ KISSY.add(function(S,Node,Base) {
                 }
                 hiddens = self.dataToHidden(data);
                 if(hiddens == EMPTY) return false;
-                form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInput' : hiddens});
+                form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInputs' : hiddens});
                 return $(form);
+            },
+            /**
+             * 创建iframe和form
+             */
+            _create : function(){
+                var self = this,
+                    iframe = self._createIframe(),
+                    form = self._createForm();
+                $('body').append(iframe);
+                $('body').append(form);
+                self.set('iframe',iframe);
+                self.set('form',form);
             }
 
     },{ATTRS : /** @lends IframeWay*/{
@@ -124,9 +135,15 @@ KISSY.add(function(S,Node,Base) {
              */
             id : {value : ID_PREFIX + S.guid()},
             /**
+             * 服务器端路径
+             */
+            action : {value : EMPTY},
+            /**
              * 传送给服务器端的参数集合（会被转成hidden元素post到服务器端）
              */
-            data : {value : {}}
+            data : {value : {}},
+            iframe : {value : {}},
+            form : {value : {}}
     }});
     
     return IframeWay;

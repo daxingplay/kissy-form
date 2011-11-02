@@ -6,15 +6,15 @@ KISSY.add(function(S, Base, Node,IframeWay,AjaxWay) {
     var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader]:';
     /**
      * @name Uploader
-     * @class 异步文件上传组件
+     * @class 异步文件上传组件，目前是使用ajax+iframe的方案，日后会加入flash方案
      * @constructor
      * @extends Base
      * @requires Node,IframeUploader,AjaxUploader
      */
-    function Uploader(){
+    function Uploader(config){
         var self = this;
         //调用父类构造函数
-        Uploader.superclass.constructor.call(self);
+        Uploader.superclass.constructor.call(self,config);
         
     }
     S.mix(Uploader,{
@@ -24,17 +24,23 @@ KISSY.add(function(S, Base, Node,IframeWay,AjaxWay) {
     S.extend(Uploader, Base, /** @lends Uploader.prototype*/{
             /**
              * 运行
+             * @return {Uploader}
              */
             render : function(){
-                var self = this,UploadWay = self.getUploadWay();
+                var self = this,serverConfig = self.get('serverConfig'),
+                    UploadWay = self.getUploadWay(),uploadWay;
                 if(!UploadWay) return false;
-
+                uploadWay = new UploadWay(serverConfig);
+                self.set('uploadWay',uploadWay );
+                self.fire(Uploader.event.RENDER);
+                return self;
             },
             /**
              * 上传文件
              */
             upload : function(){
-
+                var self = this,uploadWay = self.get('uploadWay');
+                uploadWay.upload();
             },
             /**
              * 是否支持ajax方案上传
@@ -65,12 +71,93 @@ KISSY.add(function(S, Base, Node,IframeWay,AjaxWay) {
                     return false;
                 }
                 return UploadWay;
+            },
+            /**
+             * 运行Button上传按钮组件
+             * @return {Button}
+             */
+            _renderButton : function(){
+                var self = this,button = self.get('button'),autoUpload;
+                if (!S.isObject(button)) {
+                    S.log(LOG_PREFIX + 'button参数不合法！');
+                    return false;
+                }
+                //监听按钮改变事件
+                button.on('change', function(ev) {
+                    autoUpload = self.get('autoUpload');
+                    autoUpload && self.upload(ev);
+                });
+                //运行按钮实例
+                button.render();
+                return button;
+            },
+            /**
+             * 运行Queue队列组件
+             * @return {Queue} 队列实例
+             */
+            _renderQueue : function() {
+                var self = this,queue = self.get('queue'),button = self.get('button'),
+                    urlsInput = button.urlsInput,urls;
+                if (!S.isObject(queue)) {
+                    S.log(LOG_PREFIX + 'queue参数不合法');
+                    return false;
+                }
+                //删除队列中文件后触发
+                queue.on('removeItem',function(ev){
+                    urls = DOM.val(urlsInput).split(',');
+                    if(!urls.length) return false;
+                    urls = S.filter(urls,function(url,i){
+                        return ev.index != i;
+                    });
+                    DOM.val(urlsInput,urls.join(','));
+                });
+                queue.render();
+                return queue;
             }
+
     },{ATTRS : /** @lends Uploader*/{
+            /**
+             * Button按钮的实例
+             */
+            button : {value : {}},
+            /**
+             * Queue队列的实例
+             */
+            queue : {value : {}},
             /**
              * 采用的上传方案，auto：根据浏览器自动选择，iframe：采用iframe方案，ajax：采用ajax方案
              */
-            way : {value : Uploader.WAY.AUTO}
+            way : {value : Uploader.WAY.AUTO},
+            /**
+             * 服务器端配置
+             */
+            serverConfig : {value : {action : EMPTY,data : {},dataType : 'json'}},
+            /**
+             * 是否允许上传文件
+             */
+            isAllowUpload : {value : true},
+            /**
+             * 是否自动上传
+             */
+            autoUpload : {value : true},
+            /**
+             * 文件路径（可以是多个文件路径，以逗号隔开）
+             */
+            fileUrls : {
+                value : EMPTY,
+                setter : function (v){
+                   var self = this,button = self.button,urlsInput = button.urlsInput,
+                       urls = DOM.val(urlsInput).split(',');
+                    if(!urls.length) return EMPTY;
+                    urls = S.filter(urls,function(url,i){
+                        return ev.index
+                            != i;
+                    });
+                    DOM.val(urlsInput,urls.join(','));
+                    return v;
+                }
+            },
+            uploadWay : {value : {}}
     }});
     return Uploader;
 },{requires:['base','node','./way/iframeWay','./way/ajaxWay']});

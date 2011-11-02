@@ -36,6 +36,7 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
         RenderUploader.superclass.constructor.call(self, config);
         self.set('buttonTarget',buttonTarget);
         self.set('queueTarget',queueTarget);
+        self.set('uploaderConfig',config);
         self._init();
     }
 
@@ -44,13 +45,15 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
              * 初始化组件
              */
             _init : function() {
-                var self = this,
+                var self = this,uploaderConfig = self.get('uploaderConfig'),
                     button = self._initButton(),
                     queue = self._initQueue();
                 self.set('button',button);
                 self.set('queue',queue);
-                var uploader = new Uploader();
+                
+                var uploader = new Uploader(uploaderConfig);
                 uploader.render();
+                uploader.upload();
             },
             /**
              * 初始化模拟的上传按钮
@@ -81,6 +84,10 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
                  * 队列目标元素
                  */
                 queueTarget : {value : EMPTY},
+                /**
+                 * 上传组件配置
+                 */
+                uploaderConfig : {},
                 /**
                  * Button（上传按钮）的实例
                  */
