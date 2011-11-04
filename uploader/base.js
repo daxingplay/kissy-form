@@ -2,7 +2,7 @@
  * @fileoverview 异步文件上传组件
  * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
-KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
+KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
     var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader]:';
     /**
      * @name Uploader
@@ -18,7 +18,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
         
     }
     S.mix(Uploader,{
-            WAY : {AUTO : 'auto',IFRAME : 'iframe',AJAX : 'ajax'},
+            type : {AUTO : 'auto',IFRAME : 'iframe',AJAX : 'ajax'},
             event : {}
     });
     //继承于Base，属性getter和setter委托于Base处理
@@ -29,12 +29,12 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
              */
             render : function(){
                 var self = this,serverConfig = self.get('serverConfig'),
-                    UploadWay = self.getUploadWay(),uploadWay;
-                if(!UploadWay) return false;
+                    UploadType = self.getUploadType(),uploadType;
+                if(!UploadType) return false;
                 self._renderButton();
                 self._renderUrlsInput();
-                uploadWay = new UploadWay(serverConfig);
-                self.set('uploadWay',uploadWay );
+                uploadType = new UploadType(serverConfig);
+                self.set('uploadType',uploadType );
                 //self.fire(Uploader.event.RENDER);
                 return self;
             },
@@ -42,8 +42,8 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
              * 上传文件
              */
             upload : function(){
-                var self = this,uploadWay = self.get('uploadWay');
-                uploadWay.upload();
+                var self = this,uploadType = self.get('uploadType');
+                uploadType.upload();
             },
             /**
              * 是否支持ajax方案上传
@@ -56,24 +56,24 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
              * 获取上传方式类（iframe方案或ajax方案）
              * @return {IframeWay|AjaxWay}
              */
-            getUploadWay : function(){
-                var self = this,way = self.get('way'),WAY = Uploader.WAY,
-                isSupportAjax = self.isSupportAjax(),UploadWay;
-                switch(way){
-                    case WAY.AUTO :
-                        UploadWay = isSupportAjax && AjaxWay || IframeWay;
+            getUploadType : function(){
+                var self = this,type = self.get('type'),types = Uploader.type,
+                isSupportAjax = self.isSupportAjax(),UploadType;
+                switch(type){
+                    case types.AUTO :
+                        UploadType = isSupportAjax && AjaxType || IframeType;
                     break;
-                    case WAY.IFRAME :
-                        UploadWay = IframeWay;
+                    case types.IFRAME :
+                        UploadType = IframeType;
                     break;
-                    case WAY.AJAX :
-                        UploadWay = AjaxWay;
+                    case types.AJAX :
+                        UploadType = AjaxType;
                     break;
                     default :
-                    S.log(LOG_PREFIX + 'way参数不合法，只允许配置值为'+WAY.AUTO + ',' + WAY.IFRAME + ',' + WAY.AJAX);
+                    S.log(LOG_PREFIX + 'type参数不合法，只允许配置值为'+types.AUTO + ',' + types.IFRAME + ',' + types.AJAX);
                     return false;
                 }
-                return UploadWay;
+                return UploadType;
             },
             /**
              * 运行Button上传按钮组件
@@ -135,7 +135,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
             /**
              * 采用的上传方案，auto：根据浏览器自动选择，iframe：采用iframe方案，ajax：采用ajax方案
              */
-            way : {value : Uploader.WAY.AUTO},
+            type : {value : Uploader.type.AUTO},
             /**
              * 服务器端配置
              */
@@ -152,7 +152,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeWay,AjaxWay) {
              * 存储文件路径的隐藏域的name名
              */
             urlsInputName : {value : EMPTY},
-            uploadWay : {value : {}}
+            uploadType : {value : {}}
     }});
     return Uploader;
-},{requires:['base','node','./urlsInput','./way/iframeWay','./way/ajaxWay']});
+},{requires:['base','node','./urlsInput','./type/iframe','./type/ajax']});

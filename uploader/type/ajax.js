@@ -4,8 +4,8 @@
  **/
 KISSY.add(function(S,Node) {
     var EMPTY = '',$ = Node.all;
-    function AjaxWay(){
+    function AjaxType(){
 
     }
-    return AjaxWay;
+    return AjaxType;
 },{requires:['node']});

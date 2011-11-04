@@ -3,20 +3,20 @@
  * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
 KISSY.add(function(S,Node,Base) {
-    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeWay]:',ID_PREFIX = 'ks-uploader-iframe-';
+    var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeType]:',ID_PREFIX = 'ks-uploader-iframe-';
     /**
-     * @name IframeWay
+     * @name IframeType
      * @class iframe方案上传
      * @constructor
      * @extends Base
      * @requires Node
      */
-    function IframeWay(config){
+    function IframeType(config){
         var self = this;
         //调用父类构造函数
-        IframeWay.superclass.constructor.call(self,config);
+        IframeType.superclass.constructor.call(self,config);
     }
-    S.mix(IframeWay,/**@lends IframeWay*/ {
+    S.mix(IframeType,/**@lends IframeType*/ {
         /**
          * 会用到的html模板
          */
@@ -27,7 +27,7 @@ KISSY.add(function(S,Node,Base) {
         }
     });
     //继承于Base，属性getter和setter委托于Base处理
-    S.extend(IframeWay, Base, /** @lends IframeWay.prototype*/{
+    S.extend(IframeType, Base, /** @lends IframeType.prototype*/{
             /**
              * 运行
              */
@@ -125,11 +125,11 @@ KISSY.add(function(S,Node,Base) {
                 self.set('form',form);
             }
 
-    },{ATTRS : /** @lends IframeWay*/{
+    },{ATTRS : /** @lends IframeType*/{
             /**
              * iframe方案会用到的html模板，一般不需要修改
              */
-            tpl : {value : IframeWay.tpl},
+            tpl : {value : IframeType.tpl},
             /**
              * 创建的iframeid
              */
@@ -146,5 +146,5 @@ KISSY.add(function(S,Node,Base) {
             form : {value : {}}
     }});
     
-    return IframeWay;
+    return IframeType;
 },{requires:['node','base']});
