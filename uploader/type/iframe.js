@@ -34,6 +34,9 @@ KISSY.add(function(S,Node,Base) {
             render : function(){
 
             },
+            /**
+             * 上传文件
+             */
             upload : function(){
                 var self = this;
                 self._create();

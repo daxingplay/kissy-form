@@ -60,11 +60,9 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
              * @return {Button}
              */
             _initButton : function(){
-                var self = this,urlsInputName = self.get('urlsInputName'),target = self.get('buttonTarget'),buttonConfig = {};
-                //配置下文件路径隐藏域的name名
-                if (urlsInputName) buttonConfig.urlsInputName = urlsInputName;
+                var self = this,target = self.get('buttonTarget');
                 //实例化上传按钮
-                return new Button(target, buttonConfig);
+                return new Button(target);
             },
             /**
              * 初始化上传文件队列

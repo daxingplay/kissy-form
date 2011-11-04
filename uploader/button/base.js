@@ -99,13 +99,6 @@ KISSY.add(function(S, DOM, Base, Event) {
             }
         },
         /**
-         * 用于放文件路径的隐藏域的name名
-         * @type String
-         */
-        urlsInputName : {
-            value : 'attachments'
-        },
-        /**
          * 多个文件时使用的分隔符
          * @type String
          */
@@ -164,7 +157,6 @@ KISSY.add(function(S, DOM, Base, Event) {
                     return false;
                 }
                 self._createInput();
-                self._createUrlsInput();
                 DOM.css(target, 'position', 'relative');
                 self.fire(Button.event.RENDER);
                 return self;
@@ -237,17 +229,6 @@ KISSY.add(function(S, DOM, Base, Event) {
                 return self;
             },
             /**
-             * 创建一个隐藏域，用于放上传文件的url路径
-             * @return {HTMLElement}
-             */
-            _createUrlsInput : function() {
-                var self = this,target = self.target,tpl = self.get('urlsInputTpl'),name = self.get('urlsInputName'),input;
-                if (!S.isString(tpl) || !S.isString(name)) return false;
-                input = DOM.create(tpl, {'name':name});
-                DOM.insertAfter(input, target);
-                return self.urlsInput = input;
-            },
-            /**
              * 文件上传域的值改变时触发
              * @param {Object} ev 事件对象
              */
@@ -256,7 +237,7 @@ KISSY.add(function(S, DOM, Base, Event) {
                 if (value == EMPTY) return false;
                 //文件名称
                 fileName = Button.getFileName(value);
-                self.fire(Button.event.CHANGE, {fileName : fileName});
+                self.fire(Button.event.CHANGE, {fileName : fileName,input : fileInput});
             },
             /**
              * 鼠标滑过/移开按钮
