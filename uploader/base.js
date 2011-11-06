@@ -47,9 +47,12 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
             },
             /**
              * 上传文件
+             * @param {Number} fileIndex 文件索引值
              */
-            upload : function(){
-                var self = this,uploadType = self.get('uploadType');
+            upload : function(fileIndex){
+                if(!fileIndex) return false;
+                var self = this,uploadType = self.get('uploadType'),
+                    queue = self.get('queue'), oFile = queue.getFile(fileIndex);
                 uploadType.upload();
             },
             /**

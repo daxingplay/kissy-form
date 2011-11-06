@@ -57,6 +57,13 @@ KISSY.add(function(S,Node,Base) {
                 var self = this,$target = self.get('target');
                 $target.addClass(Queue.cls.QUEUE);
                 return self;
+            },
+            /**
+             * 获取指定索引值的队列中的文件
+             * @param index
+             */
+            getFile : function(index){
+                
             }
     },{ATTRS : /** @lends Queue*/{
             /**
