@@ -87,7 +87,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
              * @return {Button}
              */
             _renderButton : function(){
-                var self = this,button = self.get('button'),fileIndex;
+                var self = this,button = self.get('button');
                 if (!S.isObject(button)) {
                     S.log(LOG_PREFIX + 'button参数不合法！');
                     return false;

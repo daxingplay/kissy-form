@@ -50,7 +50,8 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
                     queue = self._initQueue();
                 self.set('button',button);
                 self.set('queue',queue);
-                S.mix(uploaderConfig, {button : button});
+                //配置增加按钮实例和队列实例
+                S.mix(uploaderConfig, {button : button,queue : queue});
                 var uploader = new Uploader(uploaderConfig);
                 uploader.render();
                 uploader.upload();
