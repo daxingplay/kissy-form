@@ -17,23 +17,23 @@ KISSY.add(function(S,Node,Base) {
         IframeType.superclass.constructor.call(self,config);
     }
     S.mix(IframeType,/**@lends IframeType*/ {
-        /**
-         * 会用到的html模板
-         */
-        tpl : {
-            IFRAME : '<iframe src="javascript:false;" name="{id}" id="{id}" border="no" width="1" height="1" style="display: none;" />',
-            FORM : '<form method="post" enctype="multipart/form-data" action="{action}" target="{target}">{hiddenInputs}</form>',
-            HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
-        }
+            /**
+             * 会用到的html模板
+             */
+            tpl : {
+                IFRAME : '<iframe src="javascript:false;" name="{id}" id="{id}" border="no" width="1" height="1" style="display: none;" />',
+                FORM : '<form method="post" enctype="multipart/form-data" action="{action}" target="{target}">{hiddenInputs}</form>',
+                HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
+            },
+            event : {
+                //开始上传
+                START : 'start',
+                //iframe加载完成后触发
+                COMPLETE : 'complete'
+            }
     });
     //继承于Base，属性getter和setter委托于Base处理
     S.extend(IframeType, Base, /** @lends IframeType.prototype*/{
-            /**
-             * 运行
-             */
-            render : function(){
-
-            },
             /**
              * 上传文件
              * @param {HTMLElement} fileInput 文件input
@@ -41,7 +41,9 @@ KISSY.add(function(S,Node,Base) {
             upload : function(fileInput){
                 var self = this,$input = $(fileInput),form;
                 if(!$input.length) return false;
+                self.fire(IframeType.event.START,{input : $input});
                 self.set('fileInput',$input);
+                //创建iframe和form
                 self._create();
                 form = self.get('form');
                 //提交表单到iframe内
@@ -76,7 +78,9 @@ KISSY.add(function(S,Node,Base) {
                     id = self.get('id'),
                     //iframe模板
                     tpl = self.get('tpl'),iframeTpl = tpl.IFRAME,
+                    existIframe = self.get('iframe'),
                     iframe,$iframe;
+                if(!S.isEmptyObject(existIframe)) return existIframe;
                 if (!S.isString(iframeTpl)){
                     S.log(LOG_PREFIX + 'iframe的模板不合法！');
                     return false;
@@ -88,6 +92,7 @@ KISSY.add(function(S,Node,Base) {
                 //创建处理上传的iframe
                 iframe = S.substitute(tpl.IFRAME, { 'id' : id });
                 $iframe = $(iframe);
+                //监听iframe的load事件
                 $iframe.on('load',self._iframeLoadHandler,self);
                 return $iframe;
             },
@@ -95,7 +100,20 @@ KISSY.add(function(S,Node,Base) {
              * iframe加载完成后触发（文件上传结束后）
              */
             _iframeLoadHandler : function(ev){
-                
+                var self = this,iframe = ev.target,doc = iframe.contentDocument || window.frames[iframe.id].document,
+                    result;
+                if(!doc || !doc.body){
+                    S.log(LOG_PREFIX + 'iframe的文档内容不合法，为：' + doc);
+                    return false;
+                }
+                result = doc.body.innerHTML;
+                try{
+                    result = JSON.parse(result);
+                }catch(err){
+                    S.log(LOG_PREFIX + 'json数据格式不合法！');
+                }
+                self.fire(IframeType.event.COMPLETE,{result : result});
+                self._remove();
             },
             /**
              * 创建文件上传表单
@@ -141,6 +159,16 @@ KISSY.add(function(S,Node,Base) {
                 $('body').append(form);
                 self.set('iframe',iframe);
                 self.set('form',form);
+            },
+            /**
+             * 移除表单
+             */
+            _remove : function(){
+                var self = this,form = self.get('form'),iframe = self.get('iframe');
+                //移除表单
+                form.remove();
+                self.reset('form');
+                //iframe.attr('src','javascript:"<html></html>";');
             }
 
     },{ATTRS : /** @lends IframeType*/{
