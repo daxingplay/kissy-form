@@ -25,7 +25,22 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
             /**
              * 事件
              */
-            event : {}
+            event : {
+                //运行
+                RENDER : 'render',
+                //选择完文件后触发
+                SELECT : 'select',
+                //开始上传
+                START : 'start',
+                // 上传中
+                UPLOADING: 'uploading',
+                //上传完成（在上传成功或上传失败后都会触发）
+                COMPLETE :'complete',
+                //上传成功
+                SUCCESS : 'success',
+                //上传失败
+                ERROR : 'error'
+            }
     });
     //继承于Base，属性getter和setter委托于Base处理
     S.extend(Uploader, Base, /** @lends Uploader.prototype*/{
@@ -41,8 +56,9 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
                 self._renderButton();
                 self._renderUrlsInput();
                 uploadType = new UploadType(serverConfig);
+                uploadType.on('complete',self._uploadCompleteHanlder,self);
                 self.set('uploadType',uploadType );
-                //self.fire(Uploader.event.RENDER);
+                self.fire(Uploader.event.RENDER);
                 return self;
             },
             /**
@@ -53,6 +69,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
                 //if(!fileIndex) return false;
                 var self = this,uploadType = self.get('uploadType'),
                     fileInput = fileIndex.input;
+                self.fire(Uploader.event.START);
                 //    queue = self.get('queue'), oFile = queue.getFile(fileIndex);
                 uploadType.upload(fileInput);
             },
@@ -108,6 +125,7 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
             _select : function(ev){
                 var self = this,autoUpload = self.get('autoUpload'),
                     oFile = {name : ev.name,input : ev.input};
+                self.fire(Uploader.event.SELECT);
                 //self._appendToQueue(ev);
                 autoUpload && self.upload(oFile);
             },
@@ -140,6 +158,20 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
                     urlsInput = new UrlsInput(inputWrapper,{name : name});
                 urlsInput.render();
                 return urlsInput;
+            },
+            /**
+             * 当上传完毕后返回结果集的处理
+             */
+            _uploadCompleteHanlder : function(ev){
+                var self = this,result = ev.result,status,event = Uploader.event;
+                if(!S.isObject(result)) return false;
+                status = result.status;
+                if(status){
+                    self.fire(event.SUCCESS);
+                }else{
+                    self.fire(event.ERROR);
+                }
+                self.fire(event.COMPLETE);
             }
 
     },{ATTRS : /** @lends Uploader*/{
