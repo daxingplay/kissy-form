@@ -2,7 +2,7 @@
  * @fileoverview iframe方案上传
  * @author: 剑平（明河）<minghe36@126.com>,紫英<daxingplay@gmail.com>
  **/
-KISSY.add(function(S,Node,Base) {
+KISSY.add(function(S,Node,UploadType) {
     var EMPTY = '',$ = Node.all,LOG_PREFIX = '[uploader-iframeType]:',ID_PREFIX = 'ks-uploader-iframe-';
     /**
      * @name IframeType
@@ -33,7 +33,7 @@ KISSY.add(function(S,Node,Base) {
             }
     });
     //继承于Base，属性getter和setter委托于Base处理
-    S.extend(IframeType, Base, /** @lends IframeType.prototype*/{
+    S.extend(IframeType, UploadType, /** @lends IframeType.prototype*/{
             /**
              * 上传文件
              * @param {HTMLElement} fileInput 文件input
@@ -180,18 +180,10 @@ KISSY.add(function(S,Node,Base) {
              * 创建的iframeid
              */
             id : {value : ID_PREFIX + S.guid()},
-            /**
-             * 服务器端路径
-             */
-            action : {value : EMPTY},
-            /**
-             * 传送给服务器端的参数集合（会被转成hidden元素post到服务器端）
-             */
-            data : {value : {}},
             iframe : {value : {}},
             form : {value : {}},
             fileInput : {value : EMPTY}
     }});
     
     return IframeType;
-},{requires:['node','base']});
+},{requires:['node','./base']});
