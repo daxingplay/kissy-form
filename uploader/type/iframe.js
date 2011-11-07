@@ -128,7 +128,7 @@ KISSY.add(function(S,Node,Base) {
                 hiddens = self.dataToHidden(data);
                 if(hiddens == EMPTY) return false;
                 form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInputs' : hiddens});
-                return $(form).append(fileInput);
+                return $(form).append(fileInput.clone());
             },
             /**
              * 创建iframe和form
@@ -141,19 +141,6 @@ KISSY.add(function(S,Node,Base) {
                 $('body').append(form);
                 self.set('iframe',iframe);
                 self.set('form',form);
-            },
-            /**
-             * 将文件域加入到表单
-             * @param {NodeList} input 文件域
-             * @param {NodeList} 添加文件域后的表单
-             */
-            _appendFileInput : function(input){
-                //克隆文件域
-                var self = this,$inputClone = input.clone(),
-                    form = self.get('form');
-                form.append($inputClone);
-                self.set('form',form);
-                return form;
             }
 
     },{ATTRS : /** @lends IframeType*/{

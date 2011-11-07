@@ -61,7 +61,6 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
              */
             _initButton : function(){
                 var self = this,target = self.get('buttonTarget'),name = self.get('name');
-                debugger;
                 //实例化上传按钮
                 return new Button(target,{name : name});
             },
