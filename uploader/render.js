@@ -54,7 +54,6 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
                 S.mix(uploaderConfig, {button : button,queue : queue});
                 var uploader = new Uploader(uploaderConfig);
                 uploader.render();
-                uploader.upload();
             },
             /**
              * 初始化模拟的上传按钮

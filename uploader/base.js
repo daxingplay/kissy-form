@@ -50,10 +50,11 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
              * @param {Number} fileIndex 文件索引值
              */
             upload : function(fileIndex){
-                if(!fileIndex) return false;
+                //if(!fileIndex) return false;
                 var self = this,uploadType = self.get('uploadType'),
-                    queue = self.get('queue'), oFile = queue.getFile(fileIndex);
-                uploadType.upload();
+                    fileInput = fileIndex.input;
+                //    queue = self.get('queue'), oFile = queue.getFile(fileIndex);
+                uploadType.upload(fileInput);
             },
             /**
              * 是否支持ajax方案上传
@@ -105,9 +106,10 @@ KISSY.add(function(S, Base, Node,UrlsInput,IframeType,AjaxType) {
              * 选择完文件后
              */
             _select : function(ev){
-                var self = this,autoUpload = self.get('autoUpload');
-                self._appendToQueue(ev);
-                autoUpload && self.upload();
+                var self = this,autoUpload = self.get('autoUpload'),
+                    oFile = {name : ev.name,input : ev.input};
+                //self._appendToQueue(ev);
+                autoUpload && self.upload(oFile);
             },
             /**
              * 运行Queue队列组件

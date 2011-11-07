@@ -36,10 +36,14 @@ KISSY.add(function(S,Node,Base) {
             },
             /**
              * 上传文件
+             * @param {HTMLElement} fileInput 文件input
              */
-            upload : function(){
-                var self = this;
+            upload : function(fileInput){
+                var self = this,$input = $(fileInput);
+                if(!$input.length) return false;
                 self._create();
+                self._appendFileInput($input);
+
             },
             /**
              * 将参数数据转换成hidden元素
@@ -126,6 +130,19 @@ KISSY.add(function(S,Node,Base) {
                 $('body').append(form);
                 self.set('iframe',iframe);
                 self.set('form',form);
+            },
+            /**
+             * 将文件域加入到表单
+             * @param {NodeList} input 文件域
+             * @param {NodeList} 添加文件域后的表单
+             */
+            _appendFileInput : function(input){
+                //克隆文件域
+                var self = this,$inputClone = input.clone(),
+                    form = self.get('form');
+                $(form).append($inputClone);
+                self.set('form',form);
+                return form;
             }
 
     },{ATTRS : /** @lends IframeType*/{
