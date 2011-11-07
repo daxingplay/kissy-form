@@ -39,11 +39,13 @@ KISSY.add(function(S,Node,Base) {
              * @param {HTMLElement} fileInput 文件input
              */
             upload : function(fileInput){
-                var self = this,$input = $(fileInput);
+                var self = this,$input = $(fileInput),form;
                 if(!$input.length) return false;
+                self.set('fileInput',$input);
                 self._create();
-                self._appendFileInput($input);
-
+                form = self.get('form');
+                //提交表单到iframe内
+                form.getDOMNode().submit();
             },
             /**
              * 将参数数据转换成hidden元素
@@ -74,7 +76,7 @@ KISSY.add(function(S,Node,Base) {
                     id = self.get('id'),
                     //iframe模板
                     tpl = self.get('tpl'),iframeTpl = tpl.IFRAME,
-                    iframe;
+                    iframe,$iframe;
                 if (!S.isString(iframeTpl)){
                     S.log(LOG_PREFIX + 'iframe的模板不合法！');
                     return false;
@@ -85,7 +87,15 @@ KISSY.add(function(S,Node,Base) {
                 }
                 //创建处理上传的iframe
                 iframe = S.substitute(tpl.IFRAME, { 'id' : id });
-                return $(iframe);
+                $iframe = $(iframe);
+                $iframe.on('load',self._iframeLoadHandler,self);
+                return $iframe;
+            },
+            /**
+             * iframe加载完成后触发（文件上传结束后）
+             */
+            _iframeLoadHandler : function(ev){
+                
             },
             /**
              * 创建文件上传表单
@@ -101,6 +111,7 @@ KISSY.add(function(S,Node,Base) {
                     data = self.get('data'),
                     //服务器端处理文件上传的路径
                     action = self.get('action'),
+                    fileInput = self.get('fileInput'),
                     hiddens,form = EMPTY;
                 if (!S.isString(formTpl)){
                     S.log(LOG_PREFIX + 'form模板不合法！');
@@ -117,7 +128,7 @@ KISSY.add(function(S,Node,Base) {
                 hiddens = self.dataToHidden(data);
                 if(hiddens == EMPTY) return false;
                 form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInputs' : hiddens});
-                return $(form);
+                return $(form).append(fileInput);
             },
             /**
              * 创建iframe和form
@@ -140,7 +151,7 @@ KISSY.add(function(S,Node,Base) {
                 //克隆文件域
                 var self = this,$inputClone = input.clone(),
                     form = self.get('form');
-                $(form).append($inputClone);
+                form.append($inputClone);
                 self.set('form',form);
                 return form;
             }
@@ -163,7 +174,8 @@ KISSY.add(function(S,Node,Base) {
              */
             data : {value : {}},
             iframe : {value : {}},
-            form : {value : {}}
+            form : {value : {}},
+            fileInput : {value : EMPTY}
     }});
     
     return IframeType;

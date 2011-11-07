@@ -60,9 +60,10 @@ KISSY.add(function(S, Base, Node,Uploader,Button,Queue) {
              * @return {Button}
              */
             _initButton : function(){
-                var self = this,target = self.get('buttonTarget');
+                var self = this,target = self.get('buttonTarget'),name = self.get('name');
+                debugger;
                 //实例化上传按钮
-                return new Button(target);
+                return new Button(target,{name : name});
             },
             /**
              * 初始化上传文件队列
