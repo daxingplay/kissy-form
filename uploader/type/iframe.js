@@ -25,6 +25,9 @@ KISSY.add(function(S,Node,UploadType) {
                 FORM : '<form method="post" enctype="multipart/form-data" action="{action}" target="{target}">{hiddenInputs}</form>',
                 HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
             },
+            /**
+             * 事件列表
+             */
             event : {
                 //开始上传后触发
                 START : 'start',
@@ -35,7 +38,9 @@ KISSY.add(function(S,Node,UploadType) {
                 //上传失败后触发
                 ERROR : 'error',
                 //创建iframe和form后触发
-                CREATE : 'create'
+                CREATE : 'create',
+                //删除form后触发
+                REMOVE : 'remove'
             }
     });
     //继承于Base，属性getter和setter委托于Base处理
@@ -194,6 +199,7 @@ KISSY.add(function(S,Node,UploadType) {
                 form.remove();
                 //重置form属性
                 self.reset('form');
+                self.fire(IframeType.event.REMOVE,{form : form});
             }
     },{ATTRS : /** @lends IframeType*/{
             /**
