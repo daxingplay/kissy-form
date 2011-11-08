@@ -31,7 +31,9 @@ KISSY.add(function(S,Node,UploadType) {
                 //停止上传后触发
                 STOP : 'stop',
                 //iframe加载完成后触发
-                COMPLETE : 'complete'
+                COMPLETE : 'complete',
+                //上传失败
+                ERROR : 'error'
             }
     });
     //继承于Base，属性getter和setter委托于Base处理
@@ -113,10 +115,12 @@ KISSY.add(function(S,Node,UploadType) {
              * iframe加载完成后触发（文件上传结束后）
              */
             _iframeLoadHandler : function(ev){
-                var self = this,iframe = ev.target,doc = iframe.contentDocument || window.frames[iframe.id].document,
+                var self = this,iframe = ev.target,
+                    errorEvent = IframeType.event.ERROR,
+                    doc = iframe.contentDocument || window.frames[iframe.id].document,
                     result;
-                if(!doc || !doc.body){
-                    S.log(LOG_PREFIX + 'iframe的文档内容不合法，为：' + doc);
+                if(!doc || !doc.body) {
+                    self.fire(errorEvent,{msg : '服务器端返回数据有问题！'});
                     return false;
                 }
                 result = doc.body.innerHTML;
@@ -126,6 +130,7 @@ KISSY.add(function(S,Node,UploadType) {
                     result = JSON.parse(result);
                 }catch(err){
                     S.log(LOG_PREFIX + 'json数据格式不合法！');
+                    self.fire(errorEvent,{msg : '数据：'+result+'不是合法的json数据'});
                 }
                 self.fire(IframeType.event.COMPLETE,{result : result});
                 self._remove();
