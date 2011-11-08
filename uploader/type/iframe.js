@@ -26,8 +26,10 @@ KISSY.add(function(S,Node,UploadType) {
                 HIDDEN_INPUT : '<input type="hidden" name="{name}" value="{value}" />'
             },
             event : {
-                //开始上传
+                //开始上传后触发
                 START : 'start',
+                //停止上传后触发
+                STOP : 'stop',
                 //iframe加载完成后触发
                 COMPLETE : 'complete'
             }
@@ -48,6 +50,16 @@ KISSY.add(function(S,Node,UploadType) {
                 form = self.get('form');
                 //提交表单到iframe内
                 form.getDOMNode().submit();
+            },
+            /**
+             * 停止上传
+             * @return {IframeType}
+             */
+            stop : function(){
+                var self = this,iframe = self.get('iframe');
+                iframe.attr('src','javascript:"<html></html>";');
+                self.fire(IframeType.event.STOP,{iframe : iframe});
+                return self;
             },
             /**
              * 将参数数据转换成hidden元素
@@ -80,6 +92,7 @@ KISSY.add(function(S,Node,UploadType) {
                     tpl = self.get('tpl'),iframeTpl = tpl.IFRAME,
                     existIframe = self.get('iframe'),
                     iframe,$iframe;
+                //先判断是否已经存在iframe，存在直接返回iframe
                 if(!S.isEmptyObject(existIframe)) return existIframe;
                 if (!S.isString(iframeTpl)){
                     S.log(LOG_PREFIX + 'iframe的模板不合法！');
@@ -107,6 +120,8 @@ KISSY.add(function(S,Node,UploadType) {
                     return false;
                 }
                 result = doc.body.innerHTML;
+                //如果不存在json结果集，直接退出
+                if(result == EMPTY) return false;
                 try{
                     result = JSON.parse(result);
                 }catch(err){
@@ -167,10 +182,9 @@ KISSY.add(function(S,Node,UploadType) {
                 var self = this,form = self.get('form'),iframe = self.get('iframe');
                 //移除表单
                 form.remove();
+                //重置form属性
                 self.reset('form');
-                //iframe.attr('src','javascript:"<html></html>";');
             }
-
     },{ATTRS : /** @lends IframeType*/{
             /**
              * iframe方案会用到的html模板，一般不需要修改
