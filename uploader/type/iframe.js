@@ -32,8 +32,10 @@ KISSY.add(function(S,Node,UploadType) {
                 STOP : 'stop',
                 //iframe加载完成后触发
                 COMPLETE : 'complete',
-                //上传失败
-                ERROR : 'error'
+                //上传失败后触发
+                ERROR : 'error',
+                //创建iframe和form后触发
+                CREATE : 'create'
             }
     });
     //继承于Base，属性getter和setter委托于Base处理
@@ -109,6 +111,8 @@ KISSY.add(function(S,Node,UploadType) {
                 $iframe = $(iframe);
                 //监听iframe的load事件
                 $iframe.on('load',self._iframeLoadHandler,self);
+                $('body').append($iframe);
+                self.set('iframe',$iframe);
                 return $iframe;
             },
             /**
@@ -150,7 +154,7 @@ KISSY.add(function(S,Node,UploadType) {
                     //服务器端处理文件上传的路径
                     action = self.get('action'),
                     fileInput = self.get('fileInput'),
-                    hiddens,form = EMPTY;
+                    hiddens,form = EMPTY,$form;
                 if (!S.isString(formTpl)){
                     S.log(LOG_PREFIX + 'form模板不合法！');
                     return false;
@@ -166,7 +170,11 @@ KISSY.add(function(S,Node,UploadType) {
                 hiddens = self.dataToHidden(data);
                 if(hiddens == EMPTY) return false;
                 form = S.substitute(formTpl, {'action' : action,'target' : id,'hiddenInputs' : hiddens});
-                return $(form).append(fileInput.clone());
+                //克隆文件域，并添加到form中
+                $form = $(form).append(fileInput.clone());
+                $('body').append($form);
+                self.set('form',$form);
+                return $form;
             },
             /**
              * 创建iframe和form
@@ -175,10 +183,7 @@ KISSY.add(function(S,Node,UploadType) {
                 var self = this,
                     iframe = self._createIframe(),
                     form = self._createForm();
-                $('body').append(iframe);
-                $('body').append(form);
-                self.set('iframe',iframe);
-                self.set('form',form);
+                self.fire(IframeType.event.CREATE,{iframe : iframe,form : form});
             },
             /**
              * 移除表单
